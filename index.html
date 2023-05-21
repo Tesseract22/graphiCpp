@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<script>
+
+
+    (async () => {
+        var module = await WebAssembly.instantiateStreaming(
+            fetch("index.wasm")
+        );
+
+        console.log(module);
+        const exports = module.instance.exports;
+        const memory = exports.memory.buffer;
+
+        const H = exports.HEIGHT();
+        const W = exports.WIDTH();
+        console.log(H, W);
+        const cv = new ImageData(new Uint8ClampedArray(memory, exports.cv, H * W * 4), W);
+
+        exports.test();
+        console.log(cv)
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        canvas.width = W;
+        canvas.height = H;
+        ctx.putImageData(cv, 0, 0);
+    })()
+
+
+</script>
+<canvas id="canvas"></canvas>
