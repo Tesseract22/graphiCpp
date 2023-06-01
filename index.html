@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <script>
 
-
-    (async () => {
-        var module = await WebAssembly.instantiateStreaming(
-            fetch("index.wasm")
+    async function loadModule(url = "index.wasm") {
+        const module = await WebAssembly.instantiateStreaming(
+            fetch(url)
         );
+        return module;
+    }
+
+
+    async function loadDemo(module, id) {
+
 
         console.log(module);
         const exports = module.instance.exports;
@@ -14,17 +19,22 @@
         const H = exports.HEIGHT();
         const W = exports.WIDTH();
         console.log(H, W);
-        const cv = new ImageData(new Uint8ClampedArray(memory, exports.cv, H * W * 4), W);
+        const cv = new ImageData(new Uint8ClampedArray(memory, exports["cv"], H * W * 4), W);
 
-        exports.test();
+        exports.main();
         console.log(cv)
-        var canvas = document.getElementById("canvas");
-        var ctx = canvas.getContext("2d");
+        const canvas = document.getElementById(id);
+        const ctx = canvas.getContext("2d");
         canvas.width = W;
         canvas.height = H;
         ctx.putImageData(cv, 0, 0);
-    })()
+    };
+    loadModule("basic.wasm").then((module) => {
+        loadDemo(module, "basic")
+        loadDemo(module, "basic-2");
+    })
 
 
 </script>
-<canvas id="canvas"></canvas>
+<canvas id="basic"></canvas>
+<canvas id="basic-2"></canvas>

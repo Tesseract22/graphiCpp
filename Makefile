@@ -1,11 +1,11 @@
 CXX=clang++
-CXX_FLAG=
+CXX_FLAG=-Iincludes
 WASM= -Wl,--no-entry -Wl,--export-all --target=wasm32 -fno-builtin --no-standard-libraries 
 
-all: index.wasm test
+all: basic.wasm test
 
-index.wasm: src/main.cc Makefile
-	${CXX} ${CXX_FLAG} ${WASM}  src/main.cc	 -o $@ 
+basic.wasm: src/basic.cc Makefile
+	${CXX} ${CXX_FLAG} ${WASM}  src/basic.cc	 -o $@ 
 
-test: src/main.cc Makefile
-	${CXX} ${CXX_FLAG} -DDEBUG src/main.cc	 -o $@ 
+test: src/basic.cc Makefile
+	${CXX} ${CXX_FLAG} -DDEBUG src/basic.cc	 -o $@ 
