@@ -1,0 +1,15 @@
+[
+ {
+  "directory": "C:\\Users\\caleb\\PersonalCoding\\cpp\\graphics",
+  "arguments": [
+   "clang++",
+   "-I",
+   "includes",
+   "-DDEBUG",
+   "src/basic.cc",
+   "-o",
+   "test"
+  ],
+  "file": "src/basic.cc"
+ }
+]
