@@ -1,4 +1,0 @@
-basic.wasm: src/basic.cc includes/*
-	clang++ -I includes -Wl,--no-entry -Wl,--export-all --target=wasm32 -fno-builtin --no-standard-libraries src/basic.cc -o basic.wasm
-color.wasm: src/color.cc includes/*
-	clang++ -I includes -Wl,--no-entry -Wl,--export-all --target=wasm32 -fno-builtin --no-standard-libraries src/color.cc -o color.wasm
