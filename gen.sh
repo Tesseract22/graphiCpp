@@ -13,6 +13,7 @@ for entry in src/*; do
     wasm=index/${name}.wasm
 
     echo -n ${wasm} " " >> ${file}
+    echo -n bin/${name} " " >> ${file}
 done
 echo "" >> ${file}
 for entry in src/*; do
@@ -23,6 +24,9 @@ for entry in src/*; do
 
     echo ${wasm}: ${entry} "includes/*" >> ${file}
     echo -e '\t'${CXX} ${CXX_FLAG} ${WASM} ${entry} "-o" ${wasm} >> ${file}
+
+    echo bin/${name}: ${entry} "includes/*" >> ${file}
+    echo -e '\t'${CXX} ${CXX_FLAG} ${entry} "-o" bin/${name} >> ${file}
 
     
 done
