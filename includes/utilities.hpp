@@ -84,5 +84,5 @@ uint32_t HSV2RGB(int H, int S, int V) {
   }
   LOG(r_ << ' ' << g_ << ' ' << b_ << ' ' << m)
   auto cal = [m](int c) -> int { return (int)((c + m) * 255 / 10000); };
-  return 0xff000000 | (cal(r_) << 0) | ((cal(g_)) << 8) | ((cal(b_)) << 16);
+  return (cal(r_) << 0) | ((cal(g_)) << 8) | ((cal(b_)) << 16);
 }

@@ -12,16 +12,16 @@ int main() {
   cv.fill(0xff000000);
   cv.drawRect(W / 4, H / 6, W / 2, H * 2 / 3, [](int x, int y) {
     int h = (y - H / 6) * 360 / (H * 2 / 3);
-    return HSV2RGB(h, 75, 75);
+    return HSV2RGB(h, 100, 100) | 0xff000000;
   });
-  //   cv.drawCircle(
-  //       W / 2, H / 2, H / 3,
-  //       [](int x, int y) {
-  //         int r = (x - W / 2) * (x - W / 2) + (y - H / 2) * (y - H / 2);
-  //         uint8_t g = r * 0xff / (H * H / 9);
-  //         return 0xa0f00000 | (g << 8);
-  //       },
-  //       3);
+  cv.drawCircle(
+      W / 2, H / 2, H / 3,
+      [](int x, int y) -> uint32_t {
+        int r = (x - W / 2) * (x - W / 2) + (y - H / 2) * (y - H / 2);
+        uint8_t g = r * 0xff / (H * H / 9);
+        return 0x7ff00000 | (g << 8);
+      },
+      3);
   cv.drawLine(0, 0, H, W, [](int x, int y) {
     uint8_t r = x * 255 / W;
     uint8_t g = 255 - y * 255 / H;
