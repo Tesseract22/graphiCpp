@@ -3,6 +3,7 @@ CXX_FLAG=-I includes
 WASM= -Wl,--no-entry -Wl,--export-all --target=wasm32 -fno-builtin --no-standard-libraries
 file=make
 build: gen
+	mkdir -p bin
 	make -f ${file}
 
 gen: src/* gen.sh
