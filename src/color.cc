@@ -1,6 +1,7 @@
 
 
 #include "Canvas.hpp"
+#include "utilities.hpp"
 #include <stdint.h>
 const int H = 500;
 const int W = 500;
@@ -9,14 +10,16 @@ Canvas<H, W> cv;
 extern "C" {
 int main() {
   cv.fill(0xff000000);
-  cv.drawRect(W / 4, H / 6, W / 2, H * 2 / 3,
-              [](int x, int y) { return 0xff0000ff + y * 0xff; });
+  cv.drawRect(W / 4, H / 6, W / 2, H * 2 / 3, [](int x, int y) {
+    int h = (y - H / 6) * 360 / (H * 2 / 3);
+    return HSV2RGB(h, 75, 75);
+  });
   //   cv.drawCircle(
   //       W / 2, H / 2, H / 3,
   //       [](int x, int y) {
   //         int r = (x - W / 2) * (x - W / 2) + (y - H / 2) * (y - H / 2);
   //         uint8_t g = r * 0xff / (H * H / 9);
-  //         return 0xe0f00000 | (g << 8);
+  //         return 0xa0f00000 | (g << 8);
   //       },
   //       3);
   cv.drawLine(0, 0, H, W, [](int x, int y) {

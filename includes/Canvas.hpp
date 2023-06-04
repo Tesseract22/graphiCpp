@@ -4,6 +4,8 @@
 
 typedef uint32_t (*colorPicker)(int x, int y);
 
+#define CONST_PICKER(color) [](int x, int y) { return color; }
+
 template <int H, int W> struct Canvas {
   void fill(uint32_t color) {
     for (int i = 0; i < H * W; ++i) {

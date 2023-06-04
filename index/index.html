@@ -31,10 +31,12 @@
     };
     loadModule("basic.wasm").then((module) => {
         loadDemo(module, "basic")
-        loadDemo(module, "basic-2");
+    })
+    loadModule("color.wasm").then((module) => {
+        loadDemo(module, "color")
     })
 
 
 </script>
 <canvas id="basic"></canvas>
-<canvas id="basic-2"></canvas>
+<canvas id="color"></canvas>
