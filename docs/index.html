@@ -56,7 +56,8 @@
 
         }
         canvas.ontouchstart = async (ev) => {
-            console.log(t)
+            ev.preventDefault();
+
             play = !play
             while (play) {
                 exports[entry](t++ * 100)
