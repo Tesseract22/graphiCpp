@@ -55,7 +55,7 @@
             }
 
         }
-        canvas.onmousedown = async (ev) => {
+        canvas.ontouchstart = async (ev) => {
             console.log(t)
             play = !play
             while (play) {
@@ -66,6 +66,7 @@
 
         }
         canvas.onmouseleave = () => { play = false; }
+        canvas.ontouchend = () => { play = false; }
         const ctx = canvas.getContext("2d");
         canvas.width = W;
         canvas.height = H;
@@ -90,5 +91,7 @@
 </script>
 <canvas id="basic"></canvas>
 <canvas id="color"></canvas>
+<div>click or hover to play</div>
 <canvas id="3d"></canvas>
+<div>click or hover to play</div>
 <canvas id="cube"></canvas>
