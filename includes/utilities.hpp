@@ -2,13 +2,37 @@
 #include <stdint.h>
 
 #ifdef DEBUG
+#include <cmath>
 #include <iomanip>
 #include <iostream>
+
 #define LOG(arg) std::cout << arg << '\n';
+#define IMPORTED(action)
+extern "C" {
+float sinp(float p) { return std::sin(p); }
+float cosp(float p) { return std::cos(p); }
+float tanp(float p) { return std::tan(p); }
+float sqrtp(float p) { return std::sqrt(p); }
+}
+
 #else
+
 #define LOG(arg)
+#define IMPORTED(action) action
+extern "C" {
+float sinp(float p);
+float cosp(float p);
+float tanp(float p);
+float sqrtp(float p);
+}
 #endif
 
+#define COMMON_EXPORTS(w, h)                                                   \
+  extern "C" {                                                                 \
+  int WIDTH() { return w; }                                                    \
+  int HEIGHT() { return h; }                                                   \
+  }
+const extern float pi = 3.141592653589793;
 uint8_t RED(uint32_t color) { return color & 0x000000ff; }
 uint8_t GREEN(uint32_t color) { return (color >> 8) & 0x000000ff; }
 uint8_t BLUE(uint32_t color) { return (color >> 16) & 0x000000ff; }
@@ -48,6 +72,9 @@ int blend(uint32_t over, uint32_t back) {
  * @param V 0-100
  * @return uint32_t
  */
+
+float inline DEG2RAD(float deg) { return deg / 180 * pi; }
+
 uint32_t HSV2RGB(int H, int S, int V) {
   int C = V * S;
   float md = ((H / 60) % 2 + (H % 60) / 60.) - 1;
@@ -85,4 +112,26 @@ uint32_t HSV2RGB(int H, int S, int V) {
   LOG(r_ << ' ' << g_ << ' ' << b_ << ' ' << m)
   auto cal = [m](int c) -> int { return (int)((c + m) * 255 / 10000); };
   return (cal(r_) << 0) | ((cal(g_)) << 8) | ((cal(b_)) << 16);
+}
+
+float pow(float x, int i) {
+  float res = 1;
+  for (int j = 0; j < i; ++j)
+    res *= x;
+  return res;
+}
+int pow(int x, int i) {
+  int res = 1;
+  for (int j = 0; j < i; ++j)
+    res *= x;
+  return res;
+}
+
+float project(int x, int z, int cx) { return (float)(x - cx) / z; }
+int projectScreen(float x, int w, float angle) {
+  float ratio = w / (tanp(angle / 2.) * 2);
+  // 120
+  // 2 sqrt(3)
+  // 250 / sqrt(3)
+  return x * ratio + w / 2;
 }

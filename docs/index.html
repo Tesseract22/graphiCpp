@@ -1,9 +1,22 @@
 <!DOCTYPE html>
 <script>
-
+    const env = {
+        undefined: () => { console.log("env"); },
+        sinp: Math.sin,
+        cosp: Math.cos,
+        tanp: Math.tan,
+        pi: Math.PI,
+        sqrtp: Math.SQRT2
+    };
+    const imported = {}
+    imported["env"] = new Proxy(env, {
+        get: function (obj, prop) {
+            return prop in env ? env[prop] : () => { console.error("UNIMPLEMENTED: " + prop); return undefined; };
+        }
+    })
     async function loadModule(url = "index.wasm") {
         const module = await WebAssembly.instantiateStreaming(
-            fetch(url)
+            fetch(url), imported
         );
         return module;
     }
@@ -12,7 +25,7 @@
     async function loadDemo(module, id) {
 
 
-        console.log(module);
+
         const exports = module.instance.exports;
         const memory = exports.memory.buffer;
 
@@ -30,13 +43,19 @@
         ctx.putImageData(cv, 0, 0);
     };
     loadModule("basic.wasm").then((module) => {
+        console.log(module)
         loadDemo(module, "basic")
     })
     loadModule("color.wasm").then((module) => {
         loadDemo(module, "color")
     })
 
+    loadModule("3d.wasm").then((module) => {
+        loadDemo(module, "3d")
+    })
+
 
 </script>
 <canvas id="basic"></canvas>
 <canvas id="color"></canvas>
+<canvas id="3d"></canvas>

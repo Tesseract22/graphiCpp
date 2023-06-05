@@ -1,10 +1,29 @@
 #pragma once
+#include "Canvas.hpp"
 #include "utilities.hpp"
 #include <stdint.h>
 
-typedef uint32_t (*colorPicker)(int x, int y);
+typedef uint32_t (*colorPickerFunc)(int x, int y, uint32_t color);
 
-#define CONST_PICKER(color) [](int x, int y) { return color; }
+struct ColorPicker {
+  ColorPicker(uint32_t color) : color(color) {}
+  ColorPicker(colorPickerFunc func, uint32_t color = 0)
+      : func(func), color(color) {}
+
+  uint32_t operator()(int x, int y) {
+    if (func)
+      return func(x, y, color);
+    else
+      return color;
+  }
+  colorPickerFunc func = nullptr;
+  uint32_t color;
+};
+
+#define CONST_PICKER(color)                                                    \
+  {                                                                            \
+    [](int x, int y, uint32_t c) -> uint32_t { return color; }                 \
+  }
 
 template <int H, int W> struct Canvas {
   void fill(uint32_t color) {
@@ -12,7 +31,7 @@ template <int H, int W> struct Canvas {
       cv[i] = color;
     }
   }
-  void drawRect(int x0, int y0, int w, int h, colorPicker color) {
+  void drawRect(int x0, int y0, int w, int h, ColorPicker color) {
     for (int y = clampY(y0); y < clampY(h + y0); ++y) {
       for (int x = clampX(x0); x < clampX(w + x0); ++x) {
         cv[y * W + x] = blend(color(x, y), cv[y * W + x]);
@@ -20,7 +39,7 @@ template <int H, int W> struct Canvas {
     }
   }
 
-  void drawCircle(int x0, int y0, int r, colorPicker color, int antiAlias = 1) {
+  void drawCircle(int x0, int y0, int r, ColorPicker color, int antiAlias = 1) {
     int rr = r * r;
     int rr2 = (r + 1) * (r + 1);
     int inner = rr / 2;
@@ -57,7 +76,7 @@ template <int H, int W> struct Canvas {
     }
   }
 
-  void drawLine(int x0, int y0, int x1, int y1, colorPicker color) {
+  void drawLine(int x0, int y0, int x1, int y1, ColorPicker color) {
     LOG("DRAW")
     float grad = (float)(y0 - y1) / (float)(x0 - x1);
 

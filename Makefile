@@ -1,6 +1,6 @@
-CXX=clang++
+CXX=clang++ -std=c++17
 CXX_FLAG=-I includes
-WASM= -Wl,--no-entry -Wl,--export-all --target=wasm32 -fno-builtin --no-standard-libraries
+WASM= -Wl,--no-entry -Wl,--export-all -Wl,--allow-undefined --target=wasm32 -fno-builtin --no-standard-libraries
 file=make
 build: gen
 	mkdir -p bin
