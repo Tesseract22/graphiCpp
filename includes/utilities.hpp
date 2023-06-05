@@ -127,6 +127,12 @@ int pow(int x, int i) {
   return res;
 }
 
+void rotate(int &x, int &y, float angle) {
+  int tmpX = cosp(DEG2RAD(angle)) * x - sinp(DEG2RAD(angle)) * y;
+  y = sinp(DEG2RAD(angle)) * x + cosp(DEG2RAD(angle)) * y;
+  x = tmpX;
+}
+
 float project(int x, int z, int cx) { return (float)(x - cx) / z; }
 int projectScreen(float x, int w, float angle) {
   float ratio = w / (tanp(angle / 2.) * 2);

@@ -6,7 +6,7 @@
         cosp: Math.cos,
         tanp: Math.tan,
         pi: Math.PI,
-        sqrtp: Math.SQRT2
+        sqrtp: Math.sqrt
     };
     const imported = {}
     imported["env"] = new Proxy(env, {
@@ -20,9 +20,15 @@
         );
         return module;
     }
+    function sleep(time) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, time);
+        });
+    }
 
-
-    async function loadDemo(module, id) {
+    async function loadDemo(module, id, dt = 0, entry = "main") {
 
 
 
@@ -34,9 +40,22 @@
         console.log(H, W);
         const cv = new ImageData(new Uint8ClampedArray(memory, exports["cv"], H * W * 4), W);
 
-        exports.main();
+        exports[entry](dt);
         console.log(cv)
         const canvas = document.getElementById(id);
+        let t = dt;
+        let play = false;
+        canvas.onmouseover = async (ev) => {
+            console.log(t)
+            play = true
+            while (play) {
+                exports[entry](t++ * 100)
+                ctx.putImageData(cv, 0, 0)
+                await sleep(10)
+            }
+
+        }
+        canvas.onmouseleave = () => { play = false; }
         const ctx = canvas.getContext("2d");
         canvas.width = W;
         canvas.height = H;
@@ -51,7 +70,10 @@
     })
 
     loadModule("3d.wasm").then((module) => {
-        loadDemo(module, "3d")
+        loadDemo(module, "3d", 0, "render")
+    })
+    loadModule("cube.wasm").then((module) => {
+        loadDemo(module, "cube", 0, "render")
     })
 
 
@@ -59,3 +81,4 @@
 <canvas id="basic"></canvas>
 <canvas id="color"></canvas>
 <canvas id="3d"></canvas>
+<canvas id="cube"></canvas>

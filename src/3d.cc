@@ -5,15 +5,17 @@
 const int H = 500;
 const int W = 500;
 Canvas<H, W> cv;
-
+const int radius = (H + W) * 10;
+const int ct = 5;
+const float L = (H + W) / 2;
+const float POV = 60;
+const int cz = (H + W) / 2;
+const float speed = 0.01;
 extern "C" {
-int main() {
+
+void render(int dt) {
   cv.fill(0xff000000);
-  const int radius = W * 10;
-  const int ct = 5;
-  const float L = 500;
-  const float POV = 60;
-  const int cz = 250;
+
   for (int z = L / ct; z < L; z += L / ct) {
     for (int x = W / ct; x < W; x += W / ct) {
       //   LOG(projectX(x, z, W / 2))
@@ -24,16 +26,22 @@ int main() {
         uint32_t color = 0x7f000000 | (r) | (g << 8) | (b << 16);
         // LOG(x << ' ' << y << ' ' << z)
         // new_r / r =
-        LOG(project(x, z, W / 2))
+        float angle = dt * speed;
+        int xr = x - W / 2, yr = y - H / 2, zr = z - L / 2;
+        rotate(xr, zr, angle);
+        rotate(xr, yr, angle / 2);
+        rotate(yr, zr, angle / 4);
+
         cv.drawCircle(
-            projectScreen(project(x, z + cz, W / 2), W, DEG2RAD(POV)),
-            projectScreen(project(y, z + cz, H / 2), H, DEG2RAD(POV)),
-            radius / (z + cz),
+            projectScreen(project(xr, zr + cz, 0), W, DEG2RAD(POV)),
+            projectScreen(project(yr, zr + cz, 0), H, DEG2RAD(POV)),
+            radius / sqrtp((zr + cz) * (zr + cz) + (xr - 0) * (xr - W / 2)),
             {[](int x, int y, uint32_t color) { return color; }, color}, 3);
       }
     }
   }
 }
+int main() { render(10000); }
 }
 
 COMMON_EXPORTS(W, H)

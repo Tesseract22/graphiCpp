@@ -32,6 +32,14 @@ template <int H, int W> struct Canvas {
     }
   }
   void drawRect(int x0, int y0, int w, int h, ColorPicker color) {
+    if (w < 0) {
+      x0 += w;
+      w = -w;
+    }
+    if (h < 0) {
+      y0 += h;
+      h = -h;
+    }
     for (int y = clampY(y0); y < clampY(h + y0); ++y) {
       for (int x = clampX(x0); x < clampX(w + x0); ++x) {
         cv[y * W + x] = blend(color(x, y), cv[y * W + x]);
@@ -77,12 +85,11 @@ template <int H, int W> struct Canvas {
   }
 
   void drawLine(int x0, int y0, int x1, int y1, ColorPicker color) {
-    LOG("DRAW")
     float grad = (float)(y0 - y1) / (float)(x0 - x1);
 
     float intery;
     if (grad <= 1 && grad >= -1) {
-      LOG(grad)
+
       if (x0 > x1)
         return drawLine(x1, y1, x0, y0, color);
       intery = y0;
@@ -100,9 +107,9 @@ template <int H, int W> struct Canvas {
           continue;
 
         a = FPART(intery) * ALPHA(color(x, y));
-        LOG(y)
+
         cv[y * W + x] = blend(truncColor | (a << 24), cv[y * W + x]);
-        // LOG(x)
+
         intery += grad;
       }
     } else {
@@ -148,8 +155,7 @@ template <int H, int W> struct Canvas {
       intery1 = yt > y0 ? intery1 + grad1 : intery1 - grad1;
       intery2 = yt > y0 ? intery2 + grad2 : intery2 - grad2;
     }
-    LOG(x0 << ' ' << y0)
-    LOG(xt << ' ' << yt)
+
     drawLine(x0, y0, xt, yt, color);
     drawLine(x0 + w, y0, xt, yt, color);
   }
