@@ -55,6 +55,16 @@
             }
 
         }
+        canvas.onmousedown = async (ev) => {
+            console.log(t)
+            play = !play
+            while (play) {
+                exports[entry](t++ * 100)
+                ctx.putImageData(cv, 0, 0)
+                await sleep(10)
+            }
+
+        }
         canvas.onmouseleave = () => { play = false; }
         const ctx = canvas.getContext("2d");
         canvas.width = W;
