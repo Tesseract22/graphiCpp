@@ -36,7 +36,7 @@ void render(int dt) {
             projectScreen(project(xr, zr + cz, 0), W, DEG2RAD(POV)),
             projectScreen(project(yr, zr + cz, 0), H, DEG2RAD(POV)),
             radius / sqrtp((zr + cz) * (zr + cz) + (xr - 0) * (xr - W / 2)),
-            {[](int x, int y, uint32_t color) { return color; }, color}, 3);
+            [color](int x, int y) { return color; }, 3);
       }
     }
   }

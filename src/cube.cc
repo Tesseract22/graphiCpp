@@ -56,63 +56,75 @@ void render(int dt) {
   cv.drawLine(projectScreen(project(x1, z1 + cz, 0), W, POV),
               projectScreen(project(yt, z1 + cz, 0), H, POV),
               projectScreen(project(x2, z2 + cz, 0), W, POV),
-              projectScreen(project(yt, z2 + cz, 0), H, POV), {0xff0000ff});
+              projectScreen(project(yt, z2 + cz, 0), H, POV),
+              CONST_PICKER(0xff0000ff));
 
   cv.drawLine(projectScreen(project(x1, z1 + cz, 0), W, POV),
               projectScreen(project(yd, z1 + cz, 0), H, POV),
               projectScreen(project(x2, z2 + cz, 0), W, POV),
-              projectScreen(project(yd, z2 + cz, 0), H, POV), {0xff0000ff});
+              projectScreen(project(yd, z2 + cz, 0), H, POV),
+              CONST_PICKER(0xff0000ff));
 
   cv.drawLine(projectScreen(project(x1, z1 + cz, 0), W, POV),
               projectScreen(project(yt, z1 + cz, 0), H, POV),
               projectScreen(project(x1, z1 + cz, 0), W, POV),
-              projectScreen(project(yd, z1 + cz, 0), H, POV), {0xff0000ff});
+              projectScreen(project(yd, z1 + cz, 0), H, POV),
+              CONST_PICKER(0xff0000ff));
 
   cv.drawLine(projectScreen(project(x2, z2 + cz, 0), W, POV),
               projectScreen(project(yt, z2 + cz, 0), H, POV),
               projectScreen(project(x2, z2 + cz, 0), W, POV),
-              projectScreen(project(yd, z2 + cz, 0), H, POV), {0xff0000ff});
+              projectScreen(project(yd, z2 + cz, 0), H, POV),
+              CONST_PICKER(0xff0000ff));
   // front
   cv.drawLine(projectScreen(project(x3, z3 + cz, 0), W, POV),
               projectScreen(project(yt, z3 + cz, 0), H, POV),
               projectScreen(project(x4, z4 + cz, 0), W, POV),
-              projectScreen(project(yt, z4 + cz, 0), H, POV), {0xff00ff00});
+              projectScreen(project(yt, z4 + cz, 0), H, POV),
+              CONST_PICKER(0xff00ff00));
 
   cv.drawLine(projectScreen(project(x3, z3 + cz, 0), W, POV),
               projectScreen(project(yd, z3 + cz, 0), H, POV),
               projectScreen(project(x4, z4 + cz, 0), W, POV),
-              projectScreen(project(yd, z4 + cz, 0), H, POV), {0xff00ff00});
+              projectScreen(project(yd, z4 + cz, 0), H, POV),
+              CONST_PICKER(0xff00ff00));
 
   cv.drawLine(projectScreen(project(x3, z3 + cz, 0), W, POV),
               projectScreen(project(yt, z3 + cz, 0), H, POV),
               projectScreen(project(x3, z3 + cz, 0), W, POV),
-              projectScreen(project(yd, z3 + cz, 0), H, POV), {0xff00ff00});
+              projectScreen(project(yd, z3 + cz, 0), H, POV),
+              CONST_PICKER(0xff00ff00));
 
   cv.drawLine(projectScreen(project(x4, z4 + cz, 0), W, POV),
               projectScreen(project(yt, z4 + cz, 0), H, POV),
               projectScreen(project(x4, z4 + cz, 0), W, POV),
-              projectScreen(project(yd, z4 + cz, 0), H, POV), {0xff00ff00});
+              projectScreen(project(yd, z4 + cz, 0), H, POV),
+              CONST_PICKER(0xffff0000));
   // left
 
   cv.drawLine(projectScreen(project(x1, z1 + cz, 0), W, POV),
               projectScreen(project(yt, z1 + cz, 0), H, POV),
               projectScreen(project(x3, z3 + cz, 0), W, POV),
-              projectScreen(project(yt, z3 + cz, 0), H, POV), {0xffff0000});
+              projectScreen(project(yt, z3 + cz, 0), H, POV),
+              CONST_PICKER(0xffff0000));
 
   cv.drawLine(projectScreen(project(x1, z1 + cz, 0), W, POV),
               projectScreen(project(yd, z1 + cz, 0), H, POV),
               projectScreen(project(x3, z3 + cz, 0), W, POV),
-              projectScreen(project(yd, z3 + cz, 0), H, POV), {0xffff0000});
+              projectScreen(project(yd, z3 + cz, 0), H, POV),
+              CONST_PICKER(0xffff0000));
   // right
   cv.drawLine(projectScreen(project(x2, z2 + cz, 0), W, POV),
               projectScreen(project(yt, z2 + cz, 0), H, POV),
               projectScreen(project(x4, z4 + cz, 0), W, POV),
-              projectScreen(project(yt, z4 + cz, 0), H, POV), {0xffff0000});
+              projectScreen(project(yt, z4 + cz, 0), H, POV),
+              CONST_PICKER(0xffff0000));
 
   cv.drawLine(projectScreen(project(x2, z2 + cz, 0), W, POV),
               projectScreen(project(yd, z2 + cz, 0), H, POV),
               projectScreen(project(x4, z4 + cz, 0), W, POV),
-              projectScreen(project(yd, z4 + cz, 0), H, POV), {0xffff0000});
+              projectScreen(project(yd, z4 + cz, 0), H, POV),
+              CONST_PICKER(0xffff0000));
 }
 int main() { render(9000); }
 COMMON_EXPORTS(W, H)

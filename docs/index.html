@@ -1,98 +1,105 @@
 <!DOCTYPE html>
-<script>
-    const env = {
-        undefined: () => { console.log("env"); },
-        sinp: Math.sin,
-        cosp: Math.cos,
-        tanp: Math.tan,
-        pi: Math.PI,
-        sqrtp: Math.sqrt
-    };
-    const imported = {}
-    imported["env"] = new Proxy(env, {
-        get: function (obj, prop) {
-            return prop in env ? env[prop] : () => { console.error("UNIMPLEMENTED: " + prop); return undefined; };
-        }
-    })
-    async function loadModule(url = "index.wasm") {
-        const module = await WebAssembly.instantiateStreaming(
-            fetch(url), imported
-        );
-        return module;
-    }
-    function sleep(time) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve();
-            }, time);
-        });
-    }
 
-    async function loadDemo(module, id, dt = 0, entry = "main") {
-
-
-
-        const exports = module.instance.exports;
-        const memory = exports.memory.buffer;
-
-        const H = exports.HEIGHT();
-        const W = exports.WIDTH();
-        console.log(H, W);
-        const cv = new ImageData(new Uint8ClampedArray(memory, exports["cv"], H * W * 4), W);
-
-        exports[entry](dt);
-        console.log(cv)
-        const canvas = document.getElementById(id);
-        let t = dt;
-        let play = false;
-        canvas.onmouseover = async (ev) => {
-            console.log(t)
-            play = true
-            while (play) {
-                exports[entry](t++ * 100)
-                ctx.putImageData(cv, 0, 0)
-                await sleep(10)
+<head>
+    <script>
+        const env = {
+            undefined: () => { console.log("env"); },
+            sinp: Math.sin,
+            cosp: Math.cos,
+            tanp: Math.tan,
+            pi: Math.PI,
+            sqrtp: Math.sqrt
+        };
+        const imported = {}
+        imported["env"] = new Proxy(env, {
+            get: function (obj, prop) {
+                return prop in env ? env[prop] : () => { console.error("UNIMPLEMENTED: " + prop); return undefined; };
             }
-
+        })
+        async function loadModule(url = "index.wasm") {
+            const module = await WebAssembly.instantiateStreaming(
+                fetch(url), imported
+            );
+            return module;
         }
-        canvas.ontouchstart = async (ev) => {
-            ev.preventDefault();
+        function sleep(time) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, time);
+            });
+        }
 
-            play = !play
-            while (play) {
-                exports[entry](t++ * 100)
-                ctx.putImageData(cv, 0, 0)
-                await sleep(10)
+        async function loadDemo(module, id, dt = 0, entry = "main") {
+
+
+
+            const exports = module.instance.exports;
+            const memory = exports.memory.buffer;
+
+            const H = exports.HEIGHT();
+            const W = exports.WIDTH();
+            console.log(H, W);
+            const cv = new ImageData(new Uint8ClampedArray(memory, exports["cv"], H * W * 4), W);
+
+            exports[entry](dt);
+            console.log(cv)
+            const canvas = document.getElementById(id);
+            let t = dt;
+            let play = false;
+            canvas.onmouseover = async (ev) => {
+                console.log(t)
+                play = true
+                while (play) {
+                    exports[entry](t++ * 100)
+                    ctx.putImageData(cv, 0, 0)
+                    await sleep(10)
+                }
+
             }
+            canvas.ontouchstart = async (ev) => {
+                ev.preventDefault();
 
-        }
-        canvas.onmouseleave = () => { play = false; }
-        canvas.ontouchend = () => { play = false; }
-        const ctx = canvas.getContext("2d");
-        canvas.width = W;
-        canvas.height = H;
-        ctx.putImageData(cv, 0, 0);
-    };
-    loadModule("basic.wasm").then((module) => {
-        console.log(module)
-        loadDemo(module, "basic")
-    })
-    loadModule("color.wasm").then((module) => {
-        loadDemo(module, "color")
-    })
+                play = !play
+                while (play) {
+                    exports[entry](t++ * 100)
+                    ctx.putImageData(cv, 0, 0)
+                    await sleep(10)
+                }
 
-    loadModule("3d.wasm").then((module) => {
-        loadDemo(module, "3d", 0, "render")
-    })
-    loadModule("cube.wasm").then((module) => {
-        loadDemo(module, "cube", 0, "render")
-    })
+            }
+            canvas.onmouseleave = () => { play = false; }
+            canvas.ontouchend = () => { play = false; }
+            const ctx = canvas.getContext("2d");
+            canvas.width = W;
+            canvas.height = H;
+            ctx.putImageData(cv, 0, 0);
+        };
+        loadModule("basic.wasm").then((module) => {
+            console.log(module)
+            loadDemo(module, "basic")
+        })
+        loadModule("color.wasm").then((module) => {
+            loadDemo(module, "color")
+        })
+
+        loadModule("3d.wasm").then((module) => {
+            loadDemo(module, "3d", 0, "render")
+        })
+        loadModule("cube.wasm").then((module) => {
+            loadDemo(module, "cube", 0, "render")
+        })
 
 
-</script>
-<canvas id="basic"></canvas>
-<canvas id="color"></canvas>
-<div>click or hover to play</div>
-<canvas id="3d"></canvas>
-<div>click or hover to play</div>
-<canvas id="cube"></canvas>
+    </script>
+
+</head>
+
+<body>
+    <canvas id="basic"></canvas>
+    <canvas id="color"></canvas>
+    <div>touch or hover to play</div>
+    <canvas id="3d"></canvas>
+    <div>touch or hover to play</div>
+    <canvas id="cube"></canvas>
+</body>

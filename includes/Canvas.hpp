@@ -3,27 +3,7 @@
 #include "utilities.hpp"
 #include <stdint.h>
 
-typedef uint32_t (*colorPickerFunc)(int x, int y, uint32_t color);
-
-struct ColorPicker {
-  ColorPicker(uint32_t color) : color(color) {}
-  ColorPicker(colorPickerFunc func, uint32_t color = 0)
-      : func(func), color(color) {}
-
-  uint32_t operator()(int x, int y) {
-    if (func)
-      return func(x, y, color);
-    else
-      return color;
-  }
-  colorPickerFunc func = nullptr;
-  uint32_t color;
-};
-
-#define CONST_PICKER(color)                                                    \
-  {                                                                            \
-    [](int x, int y, uint32_t c) -> uint32_t { return color; }                 \
-  }
+#define CONST_PICKER(color) [](int x, int y) -> uint32_t { return color; }
 
 template <int H, int W> struct Canvas {
   void fill(uint32_t color) {
@@ -31,7 +11,8 @@ template <int H, int W> struct Canvas {
       cv[i] = color;
     }
   }
-  void drawRect(int x0, int y0, int w, int h, ColorPicker color) {
+  template <typename Functor>
+  void drawRect(int x0, int y0, int w, int h, Functor color) {
     if (w < 0) {
       x0 += w;
       w = -w;
@@ -46,8 +27,8 @@ template <int H, int W> struct Canvas {
       }
     }
   }
-
-  void drawCircle(int x0, int y0, int r, ColorPicker color, int antiAlias = 1) {
+  template <typename Functor>
+  void drawCircle(int x0, int y0, int r, Functor color, int antiAlias = 1) {
     int rr = r * r;
     int rr2 = (r + 1) * (r + 1);
     int inner = rr / 2;
@@ -83,8 +64,8 @@ template <int H, int W> struct Canvas {
       }
     }
   }
-
-  void drawLine(int x0, int y0, int x1, int y1, ColorPicker color) {
+  template <typename Functor>
+  void drawLine(int x0, int y0, int x1, int y1, Functor color) {
     float grad = (float)(y0 - y1) / (float)(x0 - x1);
 
     float intery;
@@ -93,8 +74,9 @@ template <int H, int W> struct Canvas {
       if (x0 > x1)
         return drawLine(x1, y1, x0, y0, color);
       intery = y0;
-
-      for (int x = clampX(x0); x < clampX(x1); ++x) {
+      int x0c = clampX(x0);
+      intery += grad * (x0c - x0);
+      for (int x = x0c; x < clampX(x1); ++x) {
         int y = intery;
         uint32_t truncColor = color(x, y) & 0x00ffffff;
         if (y < 0 || y >= H)
@@ -117,7 +99,9 @@ template <int H, int W> struct Canvas {
         return drawLine(x1, y1, x0, y0, color);
       grad = (float)(x0 - x1) / (float)(y0 - y1);
       intery = x0;
-      for (int y = clampY(y0); y < clampY(y1); ++y) {
+      int y0c = clampY(y0);
+      intery += grad * (y0c - y0);
+      for (int y = y0c; y < clampY(y1); ++y) {
         int x = intery;
         uint32_t truncColor = color(x, y) & 0x00ffffff;
         if (clampX(x) != x)
@@ -134,38 +118,69 @@ template <int H, int W> struct Canvas {
       }
     }
   }
-
-  void drawTriangleFlat(int x0, int y0, int w, int xt, int yt, uint32_t color) {
+  template <typename Functor>
+  void drawTriangleFlat(int x0, int y0, int w, int xt, int yt, Functor color) {
     float grad1 = (float)(x0 - xt) / (float)(y0 - yt);
     float grad2 = (float)(x0 + w - xt) / (float)(y0 - yt);
 
     float intery1 = x0;
     float intery2 = x0 + w;
-    for (int y = y0; y != yt; y = yt > y0 ? y + 1 : y - 1) {
+    if (yt > y0) {
+      int y0c = clampY(y0);
+      intery1 += (y0c - y0) * grad1;
+      intery2 += (y0c - y0) * grad2;
+      for (int y = y0c; y < clampY(yt); y++) {
 
-      int x1 = intery1;
-      int x2 = intery2;
-      if (x2 < x1)
-        swap(x1, x2);
-      for (int x = clampX(x1 + 1); x < clampX(x2 + 1); ++x) {
-        cv[y * W + x] = blend(color, cv[y * W + x]);
+        int x1 = intery1;
+        int x2 = intery2;
+        if (x2 < x1)
+          swap(x1, x2);
+        for (int x = clampX(x1 + 1); x < clampX(x2 + 1); ++x) {
+          cv[y * W + x] = blend(color(x, y), cv[y * W + x]);
+        }
+        //   cv[y * W + clampX(x1)] = blend(color, cv[y * W + clampX(x1)]);
+        //   cv[y * W + clampX(x2)] = blend(color, cv[y * W + clampX(x2)]);
+        intery1 += grad1;
+        intery2 += grad2;
       }
-      //   cv[y * W + clampX(x1)] = blend(color, cv[y * W + clampX(x1)]);
-      //   cv[y * W + clampX(x2)] = blend(color, cv[y * W + clampX(x2)]);
-      intery1 = yt > y0 ? intery1 + grad1 : intery1 - grad1;
-      intery2 = yt > y0 ? intery2 + grad2 : intery2 - grad2;
+    } else {
+      int y0c = clampY(y0);
+      intery1 += (y0c - y0) * grad1;
+      intery2 += (y0c - y0) * grad2;
+      for (int y = y0c; y > clampY(yt); y--) {
+
+        int x1 = intery1;
+        int x2 = intery2;
+        if (x2 < x1)
+          swap(x1, x2);
+        for (int x = clampX(x1 + 1); x < clampX(x2 + 1); ++x) {
+          cv[y * W + x] = blend(color(x, y), cv[y * W + x]);
+        }
+        //   cv[y * W + clampX(x1)] = blend(color, cv[y * W + clampX(x1)]);
+        //   cv[y * W + clampX(x2)] = blend(color, cv[y * W + clampX(x2)]);
+        intery1 -= grad1;
+        intery2 -= grad2;
+      }
     }
 
     drawLine(x0, y0, xt, yt, color);
     drawLine(x0 + w, y0, xt, yt, color);
   }
+  template <typename Functor>
   void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2,
-                    uint32_t color) {
+                    Functor color) {
     if (y0 >= y1 && y1 >= y2) {
       float grad = (float)(x0 - x2) / (float)(y0 - y2);
       int xm = grad * (y1 - y2) + x2;
       int w = xm - x1;
-      drawTriangleFlat(x1, y1, w, x0, y0, color);
+      LOG(y0 << ' ' << y1 << ' ' << y2)
+      drawTriangleFlat(x1, y1, w, x0, y0,
+                       [y1, color](int x, int y) -> uint32_t {
+                         if (y == y1)
+                           return 0x00000000;
+                         else
+                           return color(x, y);
+                       });
       //   LOG(x1 << ' ' << y1 << ' ' << x2 << ' ' << y2)
       drawTriangleFlat(x1, y1, w, x2, y2, color);
 
