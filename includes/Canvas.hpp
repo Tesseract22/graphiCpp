@@ -173,7 +173,7 @@ template <int H, int W> struct Canvas {
       float grad = (float)(x0 - x2) / (float)(y0 - y2);
       int xm = grad * (y1 - y2) + x2;
       int w = xm - x1;
-      LOG(y0 << ' ' << y1 << ' ' << y2)
+
       drawTriangleFlat(x1, y1, w, x0, y0,
                        [y1, color](int x, int y) -> uint32_t {
                          if (y == y1)

@@ -8,6 +8,7 @@
 
 #define LOG(arg) std::cout << arg << '\n';
 #define IMPORTED(action)
+
 extern "C" {
 float sinp(float p) { return std::sin(p); }
 float cosp(float p) { return std::cos(p); }
@@ -26,7 +27,7 @@ float tanp(float p);
 float sqrtp(float p);
 }
 #endif
-
+#define ABS(x) (x > 0 ? x : (-x))
 #define COMMON_EXPORTS(w, h)                                                   \
   extern "C" {                                                                 \
   int WIDTH() { return w; }                                                    \
@@ -83,7 +84,6 @@ uint32_t HSV2RGB(int H, int S, int V) {
   int X = C * (1 - md);
   int m = V * 100 - C;
   int r_, g_, b_;
-  LOG(C << ' ' << X)
   if (H >= 0 && H < 60) {
     r_ = C;
     g_ = X;
@@ -109,7 +109,6 @@ uint32_t HSV2RGB(int H, int S, int V) {
     g_ = 0;
     b_ = X;
   }
-  LOG(r_ << ' ' << g_ << ' ' << b_ << ' ' << m)
   auto cal = [m](int c) -> int { return (int)((c + m) * 255 / 10000); };
   return (cal(r_) << 0) | ((cal(g_)) << 8) | ((cal(b_)) << 16);
 }
@@ -131,6 +130,27 @@ void rotate(int &x, int &y, float angle) {
   int tmpX = cosp(DEG2RAD(angle)) * x - sinp(DEG2RAD(angle)) * y;
   y = sinp(DEG2RAD(angle)) * x + cosp(DEG2RAD(angle)) * y;
   x = tmpX;
+}
+
+float pointLineDist(int xp, int yp, int x1, int y1, int x2, int y2) {
+  // (x - x1) / (x2 - x1) = (y - y1) / (y2 - y1)
+  // k = (y2 - y1) / (x2 - x1)
+  // k(x - x1) = y - y1
+  // k*x - y - k*x1 + y1 = 0
+  // A = k
+  // B = -1
+  // C = -k*x1 + y1
+  //   LOG(xp << ' ' << yp)
+  //   LOG(yp - y2)
+  if (x2 == x1)
+    return ABS((xp - x2));
+  if (y2 == y1)
+    return ABS((yp - y2));
+  float grad = (float)(y2 - y1) / (x2 - x1);
+  float a = (grad * xp - yp + (-grad * x1 + y1));
+  if (a < 0)
+    a = -a;
+  return a / sqrtp(grad * grad + 1);
 }
 
 float project(int x, int z, int cx) { return (float)(x - cx) / z; }
