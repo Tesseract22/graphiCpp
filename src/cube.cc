@@ -99,7 +99,7 @@ void render(int dt) {
               projectScreen(project(yt, z4 + cz, 0), H, POV),
               projectScreen(project(x4, z4 + cz, 0), W, POV),
               projectScreen(project(yd, z4 + cz, 0), H, POV),
-              CONST_PICKER(0xffff0000));
+              CONST_PICKER(0xff00ff00));
   // left
 
   cv.drawLine(projectScreen(project(x1, z1 + cz, 0), W, POV),
