@@ -30,7 +30,8 @@ template <int H, int W> struct Canvas {
   template <typename Functor>
   void drawCircle(int x0, int y0, int r, Functor color, int antiAlias = 1) {
     int rr = r * r;
-    int rr2 = (r + 1) * (r + 1);
+    int rr_out = (r + 1) * (r + 1);
+    int rr_in = (r - 1) * (r - 1);
     int inner = rr / 2;
     int ra = rr * antiAlias * antiAlias;
 
@@ -41,10 +42,11 @@ template <int H, int W> struct Canvas {
         int d = xd + yd;
         int a = ALPHA(color(x, y));
         uint32_t truncColor = color(x, y) & 0x00ffffff;
-        if (d <= rr2) {
+        if (d <= rr_out) {
           int aCum = 0;
           uint32_t colora = 0;
-          if (xd > inner || yd > inner) {
+          // this control where to enable anti-alias
+          if (d >= rr_in) {
             for (int ya = 0; ya < antiAlias; ya++) {
               for (int xa = 0; xa < antiAlias; xa++) {
                 if (dist(x0 * antiAlias, y0 * antiAlias, x * antiAlias + xa,
@@ -192,6 +194,9 @@ template <int H, int W> struct Canvas {
         return drawTriangle(x1, y1, x2, y2, x0, y0, color);
       }
     }
+  }
+  void drawPixel(int x, int y, uint32_t color) {
+    cv[clampY(y) * W + clampX(x)] = color;
   }
   int clampX(int x) { return x < W ? (x > 0 ? x : 0) : W; }
   int clampY(int y) { return y < H ? (y > 0 ? y : 0) : H; }
