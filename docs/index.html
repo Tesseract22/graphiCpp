@@ -30,7 +30,7 @@
             });
         }
 
-        async function loadDemo(module, id, dt = 0, entry = "main") {
+        async function loadDemo(module, id, entry = (module, t) => { module.main(t); }, playable = false, drawable = false) {
 
 
 
@@ -42,38 +42,63 @@
             console.log(H, W);
             const cv = new ImageData(new Uint8ClampedArray(memory, exports["cv"], H * W * 4), W);
 
-            exports[entry](dt);
+            entry(exports);
             console.log(cv)
             const canvas = document.getElementById(id);
-            let t = dt;
-            let play = false;
-            canvas.onmouseover = async (ev) => {
-                console.log(t)
-                play = true
-                while (play) {
-                    exports[entry](t++ * 100)
-                    ctx.putImageData(cv, 0, 0)
-                    await sleep(10)
-                }
-
-            }
-            canvas.ontouchstart = async (ev) => {
-                ev.preventDefault();
-
-                play = !play
-                while (play) {
-                    exports[entry](t++ * 100)
-                    ctx.putImageData(cv, 0, 0)
-                    await sleep(10)
-                }
-
-            }
-            canvas.onmouseleave = () => { play = false; }
-            canvas.ontouchend = () => { play = false; }
             const ctx = canvas.getContext("2d");
             canvas.width = W;
             canvas.height = H;
             ctx.putImageData(cv, 0, 0);
+            if (playable) {
+                let t = 0;
+                let play = false;
+
+                canvas.onmouseover = async (ev) => {
+                    console.log(t)
+                    play = true
+                    while (play) {
+                        entry(exports, t++ * 100);
+                        ctx.putImageData(cv, 0, 0)
+                        await sleep(10)
+                    }
+
+                }
+                canvas.ontouchstart = async (ev) => {
+                    ev.preventDefault();
+
+                    play = !play
+                    while (play) {
+                        entry(exports, t++ * 100);
+                        ctx.putImageData(cv, 0, 0)
+                        await sleep(10)
+                    }
+
+                }
+                canvas.onmouseleave = () => { play = false; }
+                canvas.ontouchend = () => { play = false; }
+            }
+
+            if (drawable) {
+                canvas.onmousedown = (downEv) => {
+                    canvas.onmousemove = (moveEv) => {
+                        console.log(moveEv.offsetX, moveEv.offsetY);
+                        entry(exports, moveEv.offsetX, moveEv.offsetY);
+                        ctx.putImageData(cv, 0, 0);
+
+                    }
+                }
+                canvas.onmouseup = (ev) => {
+                    canvas.onmousemove = () => { };
+                };
+
+            }
+
+
+
+
+
+
+
         };
         loadModule("basic.wasm").then((module) => {
             console.log(module)
@@ -84,10 +109,16 @@
         })
 
         loadModule("3d.wasm").then((module) => {
-            loadDemo(module, "3d", 0, "render")
+            loadDemo(module, "3d", (module, t) => { module.render(t); }, true);
         })
         loadModule("cube.wasm").then((module) => {
-            loadDemo(module, "cube", 0, "render")
+            loadDemo(module, "cube", (module, t) => { module.render(t); }, true);
+        })
+        loadModule("triangle.wasm").then((module) => {
+            loadDemo(module, "triangle", (module, t) => { module.render(t); }, true);
+        })
+        loadModule("draw.wasm").then((module) => {
+            loadDemo(module, "draw", (module, x, y) => { module.render(x, y); }, false, true);
         })
 
 
@@ -102,4 +133,6 @@
     <canvas id="3d"></canvas>
     <div>touch or hover to play</div>
     <canvas id="cube"></canvas>
+    <canvas id="triangle"></canvas>
+    <canvas id="draw"></canvas>
 </body>
