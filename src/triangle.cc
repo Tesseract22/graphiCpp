@@ -30,36 +30,27 @@ void render(int dt) {
   int h = 0, s = 100, v = 100;
   if (normal.z > 0)
     h = 90;
-  Vec3D<float> aCam = camera.projectOnCameraCoord(a);
-  Vec3D<float> bCam = camera.projectOnCameraCoord(b);
-  Vec3D<float> cCam = camera.projectOnCameraCoord(c);
+  Vec3D<float> aCam = camera.projectOnCamera(a);
+  Vec3D<float> bCam = camera.projectOnCamera(b);
+  Vec3D<float> cCam = camera.projectOnCamera(c);
 
   Vec3D<float> aCv = camera.projectOnCanvas(a, cv);
   Vec3D<float> bCv = camera.projectOnCanvas(b, cv);
   Vec3D<float> cCv = camera.projectOnCanvas(c, cv);
-  //   int x1_ = projectScreen(project(x1, cz + z1, 0), W, POV),
-  //       y1_ = projectScreen(project(y1, cz + z1, 0), H, POV),
-  //       x2_ = projectScreen(project(x2, cz + z2, 0), W, POV),
-  //       y2_ = projectScreen(project(y2, cz + z2, 0), H, POV),
-  //       x3_ = projectScreen(project(x3, cz + z3, 0), W, POV),
-  //       y3_ = projectScreen(project(y3, cz + z3, 0), H, POV);
-  auto plane = planeFromNormal(normal, a);
-  LOG(a.x << ' ' << aCam.x << ' ' << aCv.x)
-  LOG(b.x << ' ' << bCam.x << ' ' << bCv.x)
-  cv.drawTriangle(aCv.x, aCv.y, bCv.x, bCv.y, cCv.x, cCv.y,
-                  [h, s, v, plane](int x, int y) -> uint32_t {
-                    float z = plane(x, y);
-                    int vz = v;
-                    vz = (z / 3) + 50;
-                    LOG(z << ' ' << vz)
-                    if (vz > 100)
-                      vz = 100;
-                    if (vz < 10)
-                      vz = 10;
-                    return HSV2RGB(h, s, vz) | 0xff000000;
 
-                    // if (z)
-                  });
+  auto plane = planeFromNormal(normal, a);
+  cv.drawTriangle(
+      aCv.x, aCv.y, bCv.x, bCv.y, cCv.x, cCv.y, [&](int x, int y) -> uint32_t {
+        Vec3D<float> cameraViewCoord = camera.canvas2CameraView(x, y, cv);
+        float d = (aCam * normal) / (cameraViewCoord * normal);
+        Vec3D<float> p = (d * cameraViewCoord) + camera.pos;
+        int vz = p.z / 6 + 50;
+        LOG(vz);
+        // LOG(cameraViewCoord)
+        return HSV2RGB(h, s, vz) | 0xff000000;
+
+        // if (z)
+      });
 }
 
 int main() { render(4000); }

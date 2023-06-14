@@ -117,9 +117,9 @@
         loadModule("triangle.wasm").then((module) => {
             loadDemo(module, "triangle", defaultPlay, defaultPlay, true);
         })
-        loadModule("draw.wasm").then((module) => {
-            loadDemo(module, "draw", (exports, t) => (exports.init()), (exports, x, y) => { exports.draw(x, y); }, false, true);
-        })
+        // loadModule("draw.wasm").then((module) => {
+        //  loadDemo(module, "draw", (exports, t) => (exports.init()), (exports, x, y) => { exports.draw(x, y); }, false, true);
+        // })
 
 
     </script>
@@ -131,7 +131,6 @@
     <canvas id="color"></canvas>
     <div>touch or hover to play</div>
     <canvas id="3d"></canvas>
-    <div>touch or hover to play</div>
     <canvas id="cube"></canvas>
     <canvas id="triangle"></canvas>
     <canvas id="draw"></canvas>
