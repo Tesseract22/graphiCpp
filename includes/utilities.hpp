@@ -34,6 +34,7 @@ float sqrtp(float p);
   int HEIGHT() { return h; }                                                   \
   }
 const extern float pi = 3.141592653589793;
+
 uint8_t RED(uint32_t color) { return color & 0x000000ff; }
 uint8_t GREEN(uint32_t color) { return (color >> 8) & 0x000000ff; }
 uint8_t BLUE(uint32_t color) { return (color >> 16) & 0x000000ff; }
@@ -131,6 +132,11 @@ void rotate(int &x, int &y, float angle) {
   y = sinp(DEG2RAD(angle)) * x + cosp(DEG2RAD(angle)) * y;
   x = tmpX;
 }
+void rotate(float &x, float &y, float angle) {
+  int tmpX = cosp(DEG2RAD(angle)) * x - sinp(DEG2RAD(angle)) * y;
+  y = sinp(DEG2RAD(angle)) * x + cosp(DEG2RAD(angle)) * y;
+  x = tmpX;
+}
 
 float pointLineDist(int xp, int yp, int x1, int y1, int x2, int y2) {
   // (x - x1) / (x2 - x1) = (y - y1) / (y2 - y1)
@@ -155,7 +161,7 @@ float pointLineDist(int xp, int yp, int x1, int y1, int x2, int y2) {
 
 float project(int x, int z, int cx) { return (float)(x - cx) / z; }
 int projectScreen(float x, int w, float angle) {
-  float ratio = w / (tanp(angle / 2.) * 2);
+  float ratio = w / (tanp(DEG2RAD(angle) / 2.) * 2);
   // 120
   // 2 sqrt(3)
   // 250 / sqrt(3)

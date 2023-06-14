@@ -7,7 +7,7 @@ const int H = 500;
 const int W = 500;
 Canvas<H, W> cv;
 const int cz = 500;
-const float POV = 45;
+const float POV = 60;
 const int cw = 300;
 const float speed = 0.01;
 extern "C" {

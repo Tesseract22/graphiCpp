@@ -6,6 +6,8 @@
 #define CONST_PICKER(color) [](int x, int y) -> uint32_t { return color; }
 
 template <int H, int W> struct Canvas {
+  const int h = H;
+  const int w = W;
   void fill(uint32_t color) {
     for (int i = 0; i < H * W; ++i) {
       cv[i] = color;

@@ -30,7 +30,7 @@
             });
         }
 
-        async function loadDemo(module, id, entry = (module, t) => { module.main(t); }, playable = false, drawable = false) {
+        async function loadDemo(module, id, entry = (exports, t) => { exports.main(t); }, update = (exports, t) => { exports.main(t) }, playable = false, drawable = false) {
 
 
 
@@ -57,7 +57,7 @@
                     console.log(t)
                     play = true
                     while (play) {
-                        entry(exports, t++ * 100);
+                        update(exports, t++ * 100);
                         ctx.putImageData(cv, 0, 0)
                         await sleep(10)
                     }
@@ -82,7 +82,7 @@
                 canvas.onmousedown = (downEv) => {
                     canvas.onmousemove = (moveEv) => {
                         console.log(moveEv.offsetX, moveEv.offsetY);
-                        entry(exports, moveEv.offsetX, moveEv.offsetY);
+                        update(exports, moveEv.offsetX, moveEv.offsetY);
                         ctx.putImageData(cv, 0, 0);
 
                     }
@@ -97,9 +97,9 @@
 
 
 
-
-
         };
+        const defaultPlay = (exports, t) => { exports.render(t); }
+        const noOp = () => { };
         loadModule("basic.wasm").then((module) => {
             console.log(module)
             loadDemo(module, "basic")
@@ -109,16 +109,16 @@
         })
 
         loadModule("3d.wasm").then((module) => {
-            loadDemo(module, "3d", (module, t) => { module.render(t); }, true);
+            loadDemo(module, "3d", defaultPlay, defaultPlay, true);
         })
         loadModule("cube.wasm").then((module) => {
-            loadDemo(module, "cube", (module, t) => { module.render(t); }, true);
+            loadDemo(module, "cube", defaultPlay, defaultPlay, true);
         })
         loadModule("triangle.wasm").then((module) => {
-            loadDemo(module, "triangle", (module, t) => { module.render(t); }, true);
+            loadDemo(module, "triangle", defaultPlay, defaultPlay, true);
         })
         loadModule("draw.wasm").then((module) => {
-            loadDemo(module, "draw", (module, x, y) => { module.render(x, y); }, false, true);
+            loadDemo(module, "draw", (exports, t) => (exports.init()), (exports, x, y) => { exports.draw(x, y); }, false, true);
         })
 
 
