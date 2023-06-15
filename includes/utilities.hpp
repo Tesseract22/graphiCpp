@@ -168,3 +168,6 @@ int projectScreen(float x, int w, float angle) {
   // 250 / sqrt(3)
   return x * ratio + w / 2;
 }
+
+template <typename T> T inline max(T a, T b) { return a > b ? a : b; }
+template <typename T> T inline min(T a, T b) { return a < b ? a : b; }

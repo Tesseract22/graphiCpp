@@ -85,7 +85,7 @@ struct Camera {
     return {(x - W / 2.f) / wTanPov, (y - H / 2.f) / hTanPov, 1};
   }
   inline Vec3D<float> Camera2Absolute(const Vec3D<float> &v) {
-    Vec3D<float>::rotateAll(v, -rotations) + pos;
+    return Vec3D<float>::rotateAll(v, -rotations) + pos;
   }
 
 private:

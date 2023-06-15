@@ -21,6 +21,8 @@ int main() {
   cv.drawTriangle(W / 2, H / 5, W * 3 / 4, H * 3 / 4, W / 2, H / 2,
                   CONST_PICKER(0x7fff00ff));
   cv.drawEllipse(W / 2, H / 2, H / 4, H / 3, CONST_PICKER(0x7fffff00), 3);
+
+  cv.drawEllipse(W / 4, H / 4, H / 6, H / 9, CONST_PICKER(0x40ff0000), 30, 3);
 }
 }
 
