@@ -120,12 +120,13 @@ float pow(float x, int i) {
     res *= x;
   return res;
 }
-int pow(int x, int i) {
+unsigned pow(int x, int i) {
   int res = 1;
   for (int j = 0; j < i; ++j)
     res *= x;
   return res;
 }
+inline unsigned long pow2(int x) { return x * x; }
 
 void rotate(int &x, int &y, float angle) {
   int tmpX = cosp(DEG2RAD(angle)) * x - sinp(DEG2RAD(angle)) * y;

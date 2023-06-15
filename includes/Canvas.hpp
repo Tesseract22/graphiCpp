@@ -34,7 +34,6 @@ template <int H, int W> struct Canvas {
     int rr = r * r;
     int rr_out = (r + 1) * (r + 1);
     int rr_in = (r - 1) * (r - 1);
-    int inner = rr / 2;
     int ra = rr * antiAlias * antiAlias;
 
     for (int y = clampY(y0 - r); y < clampY(y0 + r + 1); ++y) {
@@ -68,6 +67,46 @@ template <int H, int W> struct Canvas {
       }
     }
   }
+  template <typename Functor>
+  void drawEllipse(int x0, int y0, int a, int b, Functor color,
+                   int antiAlias = 1) {
+    unsigned rr_out = (a + 1) * (a + 1) * (b + 1) * (b + 1);
+    unsigned rr_in = (a - 2) * (a - 2) * (b - 2) * (b - 2);
+    unsigned ra = a * a * b * b * antiAlias * antiAlias;
+
+    for (int y = clampY(y0 - b); y < clampY(y0 + b + 1); ++y) {
+      int yd = (y - y0) * (y - y0) * a * a;
+      for (int x = clampX(x0 - a); x < clampX(x0 + a + 1); ++x) {
+        int xd = (x - x0) * (x - x0) * b * b;
+        int d = xd + yd;
+        int alpha = ALPHA(color(x, y));
+        uint32_t truncColor = color(x, y) & 0x00ffffff;
+        if (d <= rr_out) {
+          int aCum = 0;
+          uint32_t colora = 0;
+          // this control where to enable anti-alias
+          if (d >= rr_in) {
+            for (int ya = 0; ya < antiAlias; ya++) {
+              for (int xa = 0; xa < antiAlias; xa++) {
+                if (pow2((x * antiAlias + xa - x0 * antiAlias) * b) +
+                        pow2((y * antiAlias + ya - y0 * antiAlias) * a) <=
+                    ra) {
+                  aCum += alpha;
+                }
+              }
+            }
+            aCum /= (antiAlias * antiAlias);
+            // LOG(aCum)
+            colora = truncColor | (aCum << 24);
+          } else {
+            colora = color(x, y);
+          }
+          cv[y * W + x] = blend(colora, cv[y * W + x]);
+        }
+      }
+    }
+  }
+
   template <typename Functor>
   void drawLine(int x0, int y0, int x1, int y1, Functor color) {
     float grad = (float)(y0 - y1) / (float)(x0 - x1);
@@ -197,7 +236,7 @@ template <int H, int W> struct Canvas {
       }
     }
   }
-  void drawPixel(int x, int y, uint32_t color) {
+  void inline drawPixel(int x, int y, uint32_t color) {
     cv[clampY(y) * W + clampX(x)] = color;
   }
   int clampX(int x) { return x < W ? (x > 0 ? x : 0) : W; }

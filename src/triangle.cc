@@ -6,7 +6,7 @@ const int H = 500;
 const int W = 500;
 Canvas<H, W> cv;
 const int cz = 800;
-const int POV = 70;
+const int POV = 60;
 const float speed = 0.01;
 
 extern "C" {
@@ -19,7 +19,7 @@ void render(int dt) {
 
   cv.fill(0xff000000);
   float angle = dt * speed;
-  Vec3D<float> rotations = {0, angle, 0};
+  Vec3D<float> rotations = {0, angle};
   a = Vec3D<float>::rotateAll(a, rotations);
   b = Vec3D<float>::rotateAll(b, rotations);
   c = Vec3D<float>::rotateAll(c, rotations);
@@ -46,6 +46,11 @@ void render(int dt) {
         Vec3D<float> p = (d * cameraViewCoord) + camera.pos;
         int vz = p.z / 6 + 50;
         LOG(vz);
+        if (vz > 100)
+          vz = 100;
+        if (vz < 0)
+          vz = 0;
+        vz = 100 - vz;
         // LOG(cameraViewCoord)
         return HSV2RGB(h, s, vz) | 0xff000000;
 

@@ -31,10 +31,13 @@ void render(int dt) {
         rotate(xr, zr, angle);
         rotate(xr, yr, angle / 2);
         rotate(yr, zr, angle / 4);
+        float dd = (zr + cz) * (zr + cz);
+        float h = sqrtp(dd - radius * radius) * radius / sqrtp(dd);
+        float zplane = sqrtp(dd - radius * radius) * h / r;
 
         cv.drawCircle(
-            projectScreen(project(xr, zr + cz, 0), W, DEG2RAD(POV)),
-            projectScreen(project(yr, zr + cz, 0), H, DEG2RAD(POV)),
+            projectScreen(project(xr, zr + cz, 0), W, POV),
+            projectScreen(project(yr, zr + cz, 0), H, POV),
             radius / sqrtp((zr + cz) * (zr + cz) + (xr - 0) * (xr - W / 2)),
             [color](int x, int y) { return color; }, 3);
       }
