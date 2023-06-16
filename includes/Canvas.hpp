@@ -1,6 +1,6 @@
 #pragma once
 #include "Canvas.hpp"
-#include "utilities.hpp"
+#include "Math.hpp"
 #include <stdint.h>
 #define CONST_PICKER(color) [](int x, int y) -> uint32_t { return color; }
 
@@ -84,8 +84,6 @@ template <int H, int W> struct Canvas {
     auto [xtr, ytr] = rotate(x0 + a, y0 - b);
     auto [xbl, ybl] = rotate(x0 - a, y0 + b);
     auto [xbr, ybr] = rotate(x0 + a, y0 + b);
-    LOG(xtl << ' ' << ytl)
-    LOG(xbr << ' ' << ybr)
     float xs[4] = {xtl, xtr, xbl, xbr};
     float ys[4] = {ytl, ytr, ybl, ybr};
     float xstart = W, ystart = H, xend = 0, yend = 0;
@@ -137,10 +135,6 @@ template <int H, int W> struct Canvas {
         }
       }
     }
-    // drawPixel(xtl, ytl, 0xff000000);
-    // drawPixel(xtr, ytr, 0xff000000);
-    // drawPixel(xbl, ybl, 0xff000000);
-    // drawPixel(xbr, ybr, 0xff000000);
   }
   template <typename Functor>
   void drawEllipse(int x0, int y0, int a, int b, Functor color,
@@ -318,4 +312,25 @@ template <int H, int W> struct Canvas {
   int clampX(int x) { return x < W ? (x > 0 ? x : 0) : W; }
   int clampY(int y) { return y < H ? (y > 0 ? y : 0) : H; }
   uint32_t cv[H * W];
+  struct Ellipse {
+    float x, y;
+    float major, minor;
+    float rot;
+  };
+
+private:
+  static int blend(uint32_t over, uint32_t back) {
+    int a255 = 255 * ALPHA(over) + (255 - ALPHA(over)) * (ALPHA(back));
+    int r = (255 * ALPHA(over) * RED(over) +
+             (255 - ALPHA(over)) * (ALPHA(back)) * RED(back)) /
+            a255;
+    int g = (255 * ALPHA(over) * GREEN(over) +
+             (255 - ALPHA(over)) * (ALPHA(back)) * GREEN(back)) /
+            a255;
+    int b = (255 * ALPHA(over) * BLUE(over) +
+             (255 - ALPHA(over)) * (ALPHA(back)) * BLUE(back)) /
+            a255;
+    a255 /= 255;
+    return (a255 << 24) | (b << 16) | (g << 8) | (r << 0);
+  }
 };

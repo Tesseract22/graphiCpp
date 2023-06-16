@@ -1,7 +1,6 @@
 
 
 #include "Canvas.hpp"
-#include "utilities.hpp"
 #include <stdint.h>
 const int H = 500;
 const int W = 500;
@@ -10,6 +9,7 @@ const int cz = 500;
 const float POV = 60;
 const int cw = 300;
 const float speed = 0.01;
+using namespace gcmath;
 extern "C" {
 void render(int dt) {
 

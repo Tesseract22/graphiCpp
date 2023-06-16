@@ -1,5 +1,4 @@
 #include "Canvas.hpp"
-#include "utilities.hpp"
 #include <stdint.h>
 
 const int H = 500;

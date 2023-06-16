@@ -9,7 +9,9 @@
             tanp: Math.tan,
             cotp: (x) => 1 / Math.tan(x),
             pi: Math.PI,
-            sqrtp: Math.sqrt
+            sqrtp: Math.sqrt,
+            asinp: Math.asin,
+            acosp: Math.acos,
         };
         const imported = {}
         imported["env"] = new Proxy(env, {
@@ -121,6 +123,9 @@
         // loadModule("draw.wasm").then((module) => {
         //  loadDemo(module, "draw", (exports, t) => (exports.init()), (exports, x, y) => { exports.draw(x, y); }, false, true);
         // })
+        // loadModule("ball.wasm").then((module) => {
+        //     loadDemo(module, "ball", defaultPlay, defaultPlay, true);
+        // })
 
 
     </script>
@@ -131,6 +136,7 @@
     <canvas id="basic"></canvas>
     <canvas id="color"></canvas>
     <div>touch or hover to play</div>
+    <canvas id="ball"></canvas>
     <canvas id="3d"></canvas>
     <canvas id="cube"></canvas>
     <canvas id="triangle"></canvas>

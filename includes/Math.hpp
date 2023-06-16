@@ -14,6 +14,8 @@ float sinp(float p) { return std::sin(p); }
 float cosp(float p) { return std::cos(p); }
 float tanp(float p) { return std::tan(p); }
 float sqrtp(float p) { return std::sqrt(p); }
+float asinp(float p) { return std::asin(p); }
+float acosp(float p) { return std::acos(p); }
 }
 
 #else
@@ -25,6 +27,8 @@ float sinp(float p);
 float cosp(float p);
 float tanp(float p);
 float sqrtp(float p);
+float asinp(float p);
+float acosp(float p);
 }
 #endif
 #define ABS(x) (x > 0 ? x : (-x))
@@ -33,7 +37,22 @@ float sqrtp(float p);
   int WIDTH() { return w; }                                                    \
   int HEIGHT() { return h; }                                                   \
   }
+
+namespace gcmath {
+
 const extern float pi = 3.141592653589793;
+float pow(float x, int i) {
+  float res = 1;
+  for (int j = 0; j < i; ++j)
+    res *= x;
+  return res;
+}
+unsigned pow(int x, int i) {
+  int res = 1;
+  for (int j = 0; j < i; ++j)
+    res *= x;
+  return res;
+}
 
 uint8_t RED(uint32_t color) { return color & 0x000000ff; }
 uint8_t GREEN(uint32_t color) { return (color >> 8) & 0x000000ff; }
@@ -52,20 +71,6 @@ template <typename T> void swap(T &a, T &b) {
   b = tmp;
 }
 
-int blend(uint32_t over, uint32_t back) {
-  int a255 = 255 * ALPHA(over) + (255 - ALPHA(over)) * (ALPHA(back));
-  int r = (255 * ALPHA(over) * RED(over) +
-           (255 - ALPHA(over)) * (ALPHA(back)) * RED(back)) /
-          a255;
-  int g = (255 * ALPHA(over) * GREEN(over) +
-           (255 - ALPHA(over)) * (ALPHA(back)) * GREEN(back)) /
-          a255;
-  int b = (255 * ALPHA(over) * BLUE(over) +
-           (255 - ALPHA(over)) * (ALPHA(back)) * BLUE(back)) /
-          a255;
-  a255 /= 255;
-  return (a255 << 24) | (b << 16) | (g << 8) | (r << 0);
-}
 /**
  * @brief
  *
@@ -76,6 +81,7 @@ int blend(uint32_t over, uint32_t back) {
  */
 
 float inline DEG2RAD(float deg) { return deg / 180 * pi; }
+float inline RAD2DEG(float rad) { return rad * 180 / pi; }
 
 uint32_t HSV2RGB(int H, int S, int V) {
   int C = V * S;
@@ -114,18 +120,6 @@ uint32_t HSV2RGB(int H, int S, int V) {
   return (cal(r_) << 0) | ((cal(g_)) << 8) | ((cal(b_)) << 16);
 }
 
-float pow(float x, int i) {
-  float res = 1;
-  for (int j = 0; j < i; ++j)
-    res *= x;
-  return res;
-}
-unsigned pow(int x, int i) {
-  int res = 1;
-  for (int j = 0; j < i; ++j)
-    res *= x;
-  return res;
-}
 inline unsigned long pow2(int x) { return x * x; }
 
 void rotate(int &x, int &y, float angle) {
@@ -171,3 +165,4 @@ int projectScreen(float x, int w, float angle) {
 
 template <typename T> T inline max(T a, T b) { return a > b ? a : b; }
 template <typename T> T inline min(T a, T b) { return a < b ? a : b; }
+} // namespace gcmath

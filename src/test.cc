@@ -1,5 +1,5 @@
 
-#include "utilities.hpp"
+#include "Math.hpp"
 
 int main() {
   //   int h;
@@ -8,6 +8,5 @@ int main() {
   //   s = 100;
   //   v = 100;
   //   LOG(std::hex << HSV2RGB(h, s, v));
-  LOG(sin(DEG2RAD(90)))
-  LOG(projectScreen(0, 500, DEG2RAD(90)))
+  LOG(sin(gcmath::DEG2RAD(90)))
 }

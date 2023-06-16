@@ -1,12 +1,13 @@
 
 
 #include "Canvas.hpp"
-#include "utilities.hpp"
+#include "Math.hpp"
 #include <stdint.h>
 const int H = 500;
 const int W = 500;
 Canvas<H, W> cv;
-
+using gcmath::HSV2RGB;
+using gcmath::pointLineDist;
 extern "C" {
 int main() {
   cv.fill(0xff000000);
