@@ -58,7 +58,8 @@ struct Camera {
     float sinAlpha =
         Vec3D::innerProduct(posCamView, viewNorm) / (posCamViewLen * 1);
     float alpha = asinp(sinAlpha);
-    float sinTheta = sqrtp(pow2(radius) / (posCam * posCam + pow2(radius)));
+    float sinTheta =
+        sqrtp(gcmath::pow2(radius) / (posCam * posCam + gcmath::pow2(radius)));
     float theta = asinp(sinTheta);
     float beta1 = pi - theta - alpha;
     float sinBeta1 = sinp(beta1);
@@ -73,9 +74,10 @@ struct Camera {
     Vec3D test = cameraView2Canvas(posCamView, cv);
     Vec3D center = (ca1 + ca2) / 2;
     float major = (ca1 - ca2).length() / 2;
-    float minor = sqrtp(pow2(major) - pow2(cosp(beta2) / cosp(theta) * major));
+    float minor = sqrtp(gcmath::pow2(major) -
+                        gcmath::pow2(cosp(beta2) / cosp(theta) * major));
     float tmp = l * Vec3D{1, 0, 0} / l.length();
-    float rot = RAD2DEG(acosp(tmp));
+    float rot = gcmath::RAD2DEG(acosp(tmp));
 
     return {center.x, center.y, major, minor, rot};
   }

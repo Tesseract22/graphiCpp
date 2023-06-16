@@ -126,11 +126,28 @@
         // loadModule("ball.wasm").then((module) => {
         //     loadDemo(module, "ball", defaultPlay, defaultPlay, true);
         // })
+        loadModule("zbuf.wasm").then((module) => {
+            loadDemo(module, "zbuf", defaultPlay, defaultPlay, true);
+        })
 
 
     </script>
 
 </head>
+<style>
+    canvas {
+        display: block;
+
+        margin: 0 auto;
+        margin-top: 5px;
+    }
+
+    .text {
+        display: block;
+
+        text-align: center;
+    }
+</style>
 
 <body>
     <canvas id="basic"></canvas>
@@ -140,5 +157,6 @@
     <canvas id="3d"></canvas>
     <canvas id="cube"></canvas>
     <canvas id="triangle"></canvas>
-    <canvas id="draw"></canvas>
+    <!-- <canvas id="draw"></canvas> -->
+    <canvas id="zbuf"></canvas>
 </body>

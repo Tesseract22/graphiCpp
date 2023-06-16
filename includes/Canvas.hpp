@@ -44,7 +44,7 @@ template <int H, int W> struct Canvas {
       for (int x = clampX(x0 - r); x < clampX(x0 + r + 1); ++x) {
         int xd = (x - x0) * (x - x0);
         int d = xd + yd;
-        int a = ALPHA(color(x, y));
+        int a = gcmath::ALPHA(color(x, y));
         uint32_t truncColor = color(x, y) & 0x00ffffff;
         if (d <= rr_out) {
           int aCum = 0;
@@ -53,8 +53,9 @@ template <int H, int W> struct Canvas {
           if (d >= rr_in) {
             for (int ya = 0; ya < antiAlias; ya++) {
               for (int xa = 0; xa < antiAlias; xa++) {
-                if (dist(x0 * antiAlias, y0 * antiAlias, x * antiAlias + xa,
-                         y * antiAlias + ya) <= ra) {
+                if (gcmath::dist(x0 * antiAlias, y0 * antiAlias,
+                                 x * antiAlias + xa,
+                                 y * antiAlias + ya) <= ra) {
                   aCum += a;
                 }
               }
@@ -74,8 +75,8 @@ template <int H, int W> struct Canvas {
   template <typename Functor>
   void drawEllipse(int x0, int y0, int a, int b, Functor color, float rot,
                    int aa = 1) {
-    float cosR = cosp(DEG2RAD(rot));
-    float sinR = sinp(DEG2RAD(rot));
+    float cosR = cosp(gcmath::DEG2RAD(rot));
+    float sinR = sinp(gcmath::DEG2RAD(rot));
     auto rotate = [sinR, cosR, x0, y0](int x, int y) -> Ret {
       return {cosR * (x - x0) - sinR * (y - y0) + x0,
               sinR * (x - x0) + cosR * (y - y0) + y0};
@@ -105,10 +106,10 @@ template <int H, int W> struct Canvas {
     for (int y = clampY(ystart); y < clampY(yend + 1); ++y) {
 
       for (int x = clampX(xstart); x < clampX(xend + 1); ++x) {
-        unsigned d = pow2(((x - x0) * cosR - (y - y0) * sinR) * b) +
-                     pow2(((x - x0) * sinR + (y - y0) * cosR) * a);
+        unsigned d = gcmath::pow2(((x - x0) * cosR - (y - y0) * sinR) * b) +
+                     gcmath::pow2(((x - x0) * sinR + (y - y0) * cosR) * a);
         uint32_t colorRevised = color(x, y);
-        uint8_t alpha = ALPHA(colorRevised);
+        uint8_t alpha = gcmath::ALPHA(colorRevised);
         uint32_t truncColor = color(x, y) & 0x00ffffff;
         if (d <= rr_out) {
           unsigned aCum = 0;
@@ -116,12 +117,12 @@ template <int H, int W> struct Canvas {
           if (d >= rr_in) {
             for (int ya = 0; ya < aa; ya++) {
               for (int xa = 0; xa < aa; xa++) {
-                unsigned da = pow2(((x * aa + xa - x0 * aa) * cosR -
-                                    (y * aa + ya - y0 * aa) * sinR) *
-                                   b) +
-                              pow2(((x * aa + xa - x0 * aa) * sinR +
-                                    (y * aa + ya - y0 * aa) * cosR) *
-                                   a);
+                unsigned da = gcmath::pow2(((x * aa + xa - x0 * aa) * cosR -
+                                            (y * aa + ya - y0 * aa) * sinR) *
+                                           b) +
+                              gcmath::pow2(((x * aa + xa - x0 * aa) * sinR +
+                                            (y * aa + ya - y0 * aa) * cosR) *
+                                           a);
                 if (da <= ra) {
                   aCum += alpha;
                 }
@@ -149,7 +150,7 @@ template <int H, int W> struct Canvas {
       for (int x = clampX(x0 - a); x < clampX(x0 + a + 1); ++x) {
         unsigned xd = (x - x0) * (x - x0) * b * b;
         unsigned d = xd + yd;
-        uint8_t alpha = ALPHA(color(x, y));
+        uint8_t alpha = gcmath::ALPHA(color(x, y));
         uint32_t truncColor = color(x, y) & 0x00ffffff;
         if (d <= rr_out) {
           unsigned aCum = 0;
@@ -158,8 +159,9 @@ template <int H, int W> struct Canvas {
           if (d >= rr_in) {
             for (int ya = 0; ya < antiAlias; ya++) {
               for (int xa = 0; xa < antiAlias; xa++) {
-                if (pow2((x * antiAlias + xa - x0 * antiAlias) * b) +
-                        pow2((y * antiAlias + ya - y0 * antiAlias) * a) <=
+                if (gcmath::pow2((x * antiAlias + xa - x0 * antiAlias) * b) +
+                        gcmath::pow2((y * antiAlias + ya - y0 * antiAlias) *
+                                     a) <=
                     ra) {
                   aCum += alpha;
                 }
@@ -194,14 +196,14 @@ template <int H, int W> struct Canvas {
         uint32_t truncColor = color(x, y) & 0x00ffffff;
         if (y < 0 || y >= H)
           continue;
-        int a = LFPART(intery) * ALPHA(color(x, y));
+        int a = gcmath::LFPART(intery) * gcmath::ALPHA(color(x, y));
         cv[y * W + x] = blend(truncColor | (a << 24), cv[y * W + x]);
 
         y++;
         if (y >= H)
           continue;
 
-        a = FPART(intery) * ALPHA(color(x, y));
+        a = gcmath::FPART(intery) * gcmath::ALPHA(color(x, y));
 
         cv[y * W + x] = blend(truncColor | (a << 24), cv[y * W + x]);
 
@@ -219,13 +221,13 @@ template <int H, int W> struct Canvas {
         uint32_t truncColor = color(x, y) & 0x00ffffff;
         if (clampX(x) != x)
           continue;
-        int a = LFPART(intery) * ALPHA(color(x, y));
+        int a = gcmath::LFPART(intery) * gcmath::ALPHA(color(x, y));
         cv[y * W + x] = blend(truncColor | (a << 24), cv[y * W + x]);
 
         x++;
         if (clampX(x) != x)
           continue;
-        a = FPART(intery) * ALPHA(color(x, y));
+        a = gcmath::FPART(intery) * gcmath::ALPHA(color(x, y));
         cv[y * W + x] = blend(truncColor | (a << 24), cv[y * W + x]);
         intery += grad;
       }
@@ -247,7 +249,7 @@ template <int H, int W> struct Canvas {
         int x1 = intery1;
         int x2 = intery2;
         if (x2 < x1)
-          swap(x1, x2);
+          gcmath::swap(x1, x2);
         for (int x = clampX(x1 + 1); x < clampX(x2 + 1); ++x) {
           cv[y * W + x] = blend(color(x, y), cv[y * W + x]);
         }
@@ -265,7 +267,7 @@ template <int H, int W> struct Canvas {
         int x1 = intery1;
         int x2 = intery2;
         if (x2 < x1)
-          swap(x1, x2);
+          gcmath::swap(x1, x2);
         for (int x = clampX(x1 + 1); x < clampX(x2 + 1); ++x) {
           cv[y * W + x] = blend(color(x, y), cv[y * W + x]);
         }
@@ -320,15 +322,19 @@ template <int H, int W> struct Canvas {
 
 private:
   static int blend(uint32_t over, uint32_t back) {
-    int a255 = 255 * ALPHA(over) + (255 - ALPHA(over)) * (ALPHA(back));
-    int r = (255 * ALPHA(over) * RED(over) +
-             (255 - ALPHA(over)) * (ALPHA(back)) * RED(back)) /
+    int a255 = 255 * gcmath::ALPHA(over) +
+               (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back));
+    int r = (255 * gcmath::ALPHA(over) * gcmath::RED(over) +
+             (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back)) *
+                 gcmath::RED(back)) /
             a255;
-    int g = (255 * ALPHA(over) * GREEN(over) +
-             (255 - ALPHA(over)) * (ALPHA(back)) * GREEN(back)) /
+    int g = (255 * gcmath::ALPHA(over) * gcmath::GREEN(over) +
+             (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back)) *
+                 gcmath::GREEN(back)) /
             a255;
-    int b = (255 * ALPHA(over) * BLUE(over) +
-             (255 - ALPHA(over)) * (ALPHA(back)) * BLUE(back)) /
+    int b = (255 * gcmath::ALPHA(over) * gcmath::BLUE(over) +
+             (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back)) *
+                 gcmath::BLUE(back)) /
             a255;
     a255 /= 255;
     return (a255 << 24) | (b << 16) | (g << 8) | (r << 0);
