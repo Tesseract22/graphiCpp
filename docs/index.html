@@ -99,12 +99,9 @@
             canvas.ontouchstart = async (ev) => {
                 ev.preventDefault();
 
-                play = !play
-                while (play) {
-                    entry(exports, t++ * 100);
-                    ctx.putImageData(cv, 0, 0)
-                    await sleep(10)
-                }
+                play = true
+                console.log("enter");
+                window.requestAnimationFrame(render);
 
             }
             canvas.onmouseleave = () => { play = false; }
@@ -112,7 +109,7 @@
 
 
         };
-        /*
+        
         loadModule("basic.wasm").then((res) => {
             const { module, mem, heap_ptr } = res;
             loadDemo(module, mem, "basic")
@@ -141,7 +138,7 @@
             const { module, mem } = res;
             loadDemo(module, mem, "zbuf");
         })
-        */
+        
         loadModule("zsort.wasm").then((res) => {
             const { module, mem } = res;
             loadDemo(module, mem, "zsort");
