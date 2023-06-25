@@ -4,6 +4,15 @@
 #include <stdint.h>
 #define CONST_PICKER(color) [](int x, int y) -> uint32_t { return color; }
 
+#ifdef DEBUG
+#include <stdlib.h>
+extern "C" unsigned long long alloc(unsigned long long size) {
+  return (unsigned long long)malloc(size);
+}
+#else
+extern "C" unsigned long long alloc(unsigned long long size);
+#endif
+
 template <int H, int W> struct Canvas {
   struct Ret {
     float x;
@@ -321,22 +330,42 @@ template <int H, int W> struct Canvas {
   };
 
 private:
-  static int blend(uint32_t over, uint32_t back) {
-    int a255 = 255 * gcmath::ALPHA(over) +
-               (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back));
-    int r = (255 * gcmath::ALPHA(over) * gcmath::RED(over) +
-             (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back)) *
-                 gcmath::RED(back)) /
-            a255;
-    int g = (255 * gcmath::ALPHA(over) * gcmath::GREEN(over) +
-             (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back)) *
-                 gcmath::GREEN(back)) /
-            a255;
-    int b = (255 * gcmath::ALPHA(over) * gcmath::BLUE(over) +
-             (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back)) *
-                 gcmath::BLUE(back)) /
-            a255;
-    a255 /= 255;
-    return (a255 << 24) | (b << 16) | (g << 8) | (r << 0);
+  //   static int blend(uint32_t over, uint32_t back) {
+  //     int a255 = 255 * gcmath::ALPHA(over) +
+  //                (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back));
+  //     int r = (255 * gcmath::ALPHA(over) * gcmath::RED(over) +
+  //              (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back)) *
+  //                  gcmath::RED(back)) /
+  //             a255;
+  //     int g = (255 * gcmath::ALPHA(over) * gcmath::GREEN(over) +
+  //              (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back)) *
+  //                  gcmath::GREEN(back)) /
+  //             a255;
+  //     int b = (255 * gcmath::ALPHA(over) * gcmath::BLUE(over) +
+  //              (255 - gcmath::ALPHA(over)) * (gcmath::ALPHA(back)) *
+  //                  gcmath::BLUE(back)) /
+  //             a255;
+  //     a255 /= 255;
+  //     return (a255 << 24) | (b << 16) | (g << 8) | (r << 0);
+  //   }
+
+  static uint32_t blend(uint32_t over, uint32_t back) {
+    uint8_t a =
+        gcmath::min(gcmath::ALPHA(over) +
+                        gcmath::ALPHA(back) * (255 - gcmath::ALPHA(over)) / 255,
+                    255);
+    uint8_t r =
+        gcmath::min(gcmath::RED(over) +
+                        gcmath::RED(back) * (255 - gcmath::ALPHA(over)) / 255,
+                    255);
+    uint8_t g =
+        gcmath::min(gcmath::GREEN(over) +
+                        gcmath::GREEN(back) * (255 - gcmath::ALPHA(over)) / 255,
+                    255);
+    uint8_t b =
+        gcmath::min(gcmath::BLUE(over) +
+                        gcmath::BLUE(back) * (255 - gcmath::ALPHA(over)) / 255,
+                    255);
+    return (a << 24) | (b << 16) | (g << 8) | (r << 0);
   }
 };

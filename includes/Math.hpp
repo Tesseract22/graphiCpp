@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <stdlib.h>
 
 #define LOG(arg) std::cout << arg << '\n';
 #define IMPORTED(action)

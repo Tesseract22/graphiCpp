@@ -2,28 +2,44 @@
 
 <head>
     <script>
-        const env = {
-            undefined: () => { console.log("env"); },
-            sinp: Math.sin,
-            cosp: Math.cos,
-            tanp: Math.tan,
-            cotp: (x) => 1 / Math.tan(x),
-            pi: Math.PI,
-            sqrtp: Math.sqrt,
-            asinp: Math.asin,
-            acosp: Math.acos,
-        };
-        const imported = {}
-        imported["env"] = new Proxy(env, {
-            get: function (obj, prop) {
-                return prop in env ? env[prop] : () => { console.error("UNIMPLEMENTED: " + prop); return undefined; };
-            }
-        })
         async function loadModule(url = "index.wasm") {
-            const module = await WebAssembly.instantiateStreaming(
+            const mem = new WebAssembly.Memory({
+                initial: 100,
+                maximum: 100,
+            })
+
+            const heap_ptr = { value: 0 };
+            const env = {
+                sinp: Math.sin,
+                cosp: Math.cos,
+                tanp: Math.tan,
+                cotp: (x) => 1 / Math.tan(x),
+                pi: Math.PI,
+                sqrtp: Math.sqrt,
+                asinp: Math.asin,
+                acosp: Math.acos,
+                heap_ptr: heap_ptr,
+                alloc: (x) => { const tmp = heap_ptr.value; heap_ptr.value += x; return tmp; }
+            };
+            const imported = {}
+            imported["env"] = new Proxy(env, {
+                get: function (obj, prop) {
+                    if (prop in env) {
+                        // console.log(prop, "prop in environment");
+                        return env[prop];
+                    } else {
+                        // console.log("UNIMPLEMENTED:", prop);
+                        return () => 0;
+                    }
+                }
+            })
+            imported["env"]["memory"] = mem;
+            // imported["js"] = { mem: mem };
+            let module = await WebAssembly.instantiateStreaming(
                 fetch(url), imported
             );
-            return module;
+
+            return { module, mem, heap_ptr };
         }
         function sleep(time) {
             return new Promise((resolve) => {
@@ -32,103 +48,102 @@
                 }, time);
             });
         }
+        async function loadDemo(module, mem, id) {
 
-        async function loadDemo(module, id, entry = (exports, t) => { exports.main(t); }, update = (exports, t) => { exports.main(t) }, playable = false, drawable = false) {
-
-
+            console.log(module)
 
             const exports = module.instance.exports;
-            const memory = exports.memory.buffer;
-
+            const memory = mem.buffer;
             const H = exports.HEIGHT();
             const W = exports.WIDTH();
             console.log(H, W);
+            exports.render(0);
             const cv = new ImageData(new Uint8ClampedArray(memory, exports["cv"], H * W * 4), W);
 
-            entry(exports);
+
             console.log(cv)
             const canvas = document.getElementById(id);
             const ctx = canvas.getContext("2d");
             canvas.width = W;
             canvas.height = H;
             ctx.putImageData(cv, 0, 0);
-            if (playable) {
-                let t = 0;
-                let play = false;
 
-                canvas.onmouseover = async (ev) => {
-                    console.log(t)
-                    play = true
-                    while (play) {
-                        update(exports, t++ * 100);
-                        ctx.putImageData(cv, 0, 0)
-                        await sleep(10)
-                    }
 
+            let play = false;
+            let prev;
+            let dt = 0
+            const render = (t) => {
+                if (prev === undefined) prev = t;
+                dt += (t - prev);
+                prev = t;
+                if (play) {
+                    const before = Date.now();
+                    exports.render(dt * 5);
+                    // console.log(Date.now() - before);
+                    ctx.putImageData(cv, 0, 0);
+                    window.requestAnimationFrame(render);
+                } else {
+                    prev = undefined;
                 }
-                canvas.ontouchstart = async (ev) => {
-                    ev.preventDefault();
 
-                    play = !play
-                    while (play) {
-                        entry(exports, t++ * 100);
-                        ctx.putImageData(cv, 0, 0)
-                        await sleep(10)
-                    }
-
-                }
-                canvas.onmouseleave = () => { play = false; }
-                canvas.ontouchend = () => { play = false; }
-            }
-
-            if (drawable) {
-                canvas.onmousedown = (downEv) => {
-                    canvas.onmousemove = (moveEv) => {
-                        console.log(moveEv.offsetX, moveEv.offsetY);
-                        update(exports, moveEv.offsetX, moveEv.offsetY);
-                        ctx.putImageData(cv, 0, 0);
-
-                    }
-                }
-                canvas.onmouseup = (ev) => {
-                    canvas.onmousemove = () => { };
-                };
 
             }
+            canvas.onmouseenter = async (ev) => {
+                play = true
+                console.log("enter");
+                window.requestAnimationFrame(render);
 
+            }
+            canvas.ontouchstart = async (ev) => {
+                ev.preventDefault();
 
+                play = !play
+                while (play) {
+                    entry(exports, t++ * 100);
+                    ctx.putImageData(cv, 0, 0)
+                    await sleep(10)
+                }
 
+            }
+            canvas.onmouseleave = () => { play = false; }
+            canvas.ontouchend = () => { play = false; }
 
 
         };
-        const defaultPlay = (exports, t) => { exports.render(t); }
-        const noOp = () => { };
-        loadModule("basic.wasm").then((module) => {
-            console.log(module)
-            loadDemo(module, "basic")
-        })
-        loadModule("color.wasm").then((module) => {
-            loadDemo(module, "color")
+        loadModule("basic.wasm").then((res) => {
+            const { module, mem, heap_ptr } = res;
+            loadDemo(module, mem, "basic")
         })
 
-        loadModule("3d.wasm").then((module) => {
-            loadDemo(module, "3d", defaultPlay, defaultPlay, true);
+        loadModule("color.wasm").then((res) => {
+            const { module, mem } = res;
+            loadDemo(module, mem, "color")
         })
-        loadModule("cube.wasm").then((module) => {
-            loadDemo(module, "cube", defaultPlay, defaultPlay, true);
+
+
+        loadModule("3d.wasm").then((res) => {
+            const { module, mem } = res;
+            loadDemo(module, mem, "3d");
         })
-        loadModule("triangle.wasm").then((module) => {
-            loadDemo(module, "triangle", defaultPlay, defaultPlay, true);
+        loadModule("cube.wasm").then((res) => {
+            const { module, mem } = res;
+            loadDemo(module, mem, "cube");
         })
-        // loadModule("draw.wasm").then((module) => {
-        //  loadDemo(module, "draw", (exports, t) => (exports.init()), (exports, x, y) => { exports.draw(x, y); }, false, true);
-        // })
-        // loadModule("ball.wasm").then((module) => {
-        //     loadDemo(module, "ball", defaultPlay, defaultPlay, true);
-        // })
-        loadModule("zbuf.wasm").then((module) => {
-            loadDemo(module, "zbuf", defaultPlay, defaultPlay, true);
+        loadModule("triangle.wasm").then((res) => {
+            const { module, mem } = res;
+            loadDemo(module, mem, "triangle");
         })
+
+        loadModule("zbuf.wasm").then((res) => {
+            const { module, mem } = res;
+            loadDemo(module, mem, "zbuf");
+        })
+
+        loadModule("zsort.wasm").then((res) => {
+            const { module, mem } = res;
+            loadDemo(module, mem, "zsort");
+        })
+
 
 
     </script>
@@ -159,4 +174,5 @@
     <canvas id="triangle"></canvas>
     <!-- <canvas id="draw"></canvas> -->
     <canvas id="zbuf"></canvas>
+    <canvas id="zsort"></canvas>
 </body>

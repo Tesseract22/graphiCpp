@@ -5,8 +5,11 @@ const int H = 500;
 const int W = 500;
 Canvas<H, W> cv;
 
+int *arr = (int *)alloc(1000);
+
 extern "C" {
-int main() {
+
+void render(int dt) {
   cv.fill(0xff00ff00);
   cv.drawRect(W / 4, H / 6, W / 2, H * 2 / 3,
               [](int x, int y) { return 0xffff0000; });
@@ -23,6 +26,8 @@ int main() {
 
   cv.drawEllipse(W / 4, H / 4, H / 6, H / 9, CONST_PICKER(0x40ff0000), 30, 3);
 }
+
+int main() { render(0); }
 }
 
 COMMON_EXPORTS(W, H)
