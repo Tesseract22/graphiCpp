@@ -328,6 +328,7 @@ template <int H, int W> struct Canvas {
     float major, minor;
     float rot;
   };
+  //   bool blending = true;
 
 private:
   //   static int blend(uint32_t over, uint32_t back) {
@@ -349,7 +350,7 @@ private:
   //     return (a255 << 24) | (b << 16) | (g << 8) | (r << 0);
   //   }
 
-  static uint32_t blend(uint32_t over, uint32_t back) {
+  uint32_t blend(uint32_t over, uint32_t back) {
     uint8_t a =
         gcmath::min(gcmath::ALPHA(over) +
                         gcmath::ALPHA(back) * (255 - gcmath::ALPHA(over)) / 255,

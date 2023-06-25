@@ -19,7 +19,8 @@
                 asinp: Math.asin,
                 acosp: Math.acos,
                 heap_ptr: heap_ptr,
-                alloc: (x) => { const tmp = heap_ptr.value; heap_ptr.value += x; return tmp; }
+                alloc: (x) => { const tmp = heap_ptr.value; heap_ptr.value += x; return tmp; },
+                putInt: x => console.log(x),
             };
             const imported = {}
             imported["env"] = new Proxy(env, {

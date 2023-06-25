@@ -31,18 +31,18 @@ struct Camera {
             1};
   }
   template <int H, int W>
-  inline Vec3D canvas2CameraView(int x, int y, const Canvas<H, W> &cv) {
+  inline Vec3D canvas2CameraView(int x, int y, const Canvas<H, W> &cv) const {
     static float wTanPov = W / (tanPov * 2);
     static float hTanPov = H / (tanPov * 2);
     return {(x - W / 2.f) / wTanPov, (y - H / 2.f) / hTanPov, 1};
   }
   template <int H, int W>
-  inline Vec3D cameraView2Canvas(Vec3D v, const Canvas<H, W> &cv) {
+  inline Vec3D cameraView2Canvas(Vec3D v, const Canvas<H, W> &cv) const {
     static float wTanPov = W / (tanPov * 2);
     static float hTanPov = H / (tanPov * 2);
     return {v.x * wTanPov + W / 2.f, v.y * hTanPov + H / 2.f, 1};
   }
-  inline Vec3D camera2Absolute(const Vec3D &v) {
+  inline Vec3D camera2Absolute(const Vec3D &v) const {
     return Vec3D::rotateAll(v, -rotations) + pos;
   }
 
