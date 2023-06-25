@@ -14,7 +14,7 @@ const int cz = (H + W) / -2;
 const float speed = 0.01;
 using gcmath::dist;
 using gcmath::pow2;
-using gcmath::rotate;
+using gcmath::rotateFloat;
 extern "C" {
 
 void render(int dt) {
@@ -32,9 +32,9 @@ void render(int dt) {
         // new_r / r =
         float angle = dt * speed;
         float xr = x - W / 2, yr = y - H / 2, zr = z - L / 2;
-        rotate(xr, zr, angle);
-        rotate(xr, yr, angle / 2);
-        rotate(yr, zr, angle / 4);
+        rotateFloat(xr, zr, angle);
+        rotateFloat(xr, yr, angle / 2);
+        rotateFloat(yr, zr, angle / 4);
         auto e = camera.projectSphereOnCanvas({xr, yr, zr}, radius, cv);
         cv.drawEllipse(
             e.x, e.y, e.major, e.minor,

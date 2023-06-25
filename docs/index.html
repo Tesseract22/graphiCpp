@@ -21,6 +21,7 @@
                 heap_ptr: heap_ptr,
                 alloc: (x) => { const tmp = heap_ptr.value; heap_ptr.value += x; return tmp; },
                 putInt: x => console.log(x),
+                putFloat: x => console.log(x),
             };
             const imported = {}
             imported["env"] = new Proxy(env, {
@@ -111,6 +112,7 @@
 
 
         };
+        /*
         loadModule("basic.wasm").then((res) => {
             const { module, mem, heap_ptr } = res;
             loadDemo(module, mem, "basic")
@@ -139,7 +141,7 @@
             const { module, mem } = res;
             loadDemo(module, mem, "zbuf");
         })
-
+        */
         loadModule("zsort.wasm").then((res) => {
             const { module, mem } = res;
             loadDemo(module, mem, "zsort");

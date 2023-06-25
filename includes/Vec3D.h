@@ -41,9 +41,9 @@ template <typename T> struct Vec3 {
   }
   static Vec3 rotateAll(const Vec3 &v, const Vec3<float> &rotations) {
     auto cp = v;
-    gcmath::rotate(cp.y, cp.z, rotations.x);
-    gcmath::rotate(cp.x, cp.z, rotations.y);
-    gcmath::rotate(cp.x, cp.y, rotations.z);
+    gcmath::rotateFloat(cp.y, cp.z, rotations.x);
+    gcmath::rotateFloat(cp.x, cp.z, rotations.y);
+    gcmath::rotateFloat(cp.x, cp.y, rotations.z);
     return cp;
   }
   static auto planeFromNormal(const Vec3<float> &n, const Vec3<float> &p) {

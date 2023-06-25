@@ -123,13 +123,13 @@ uint32_t HSV2RGB(int H, int S, int V) {
 
 inline unsigned long pow2(int x) { return x * x; }
 
-void rotate(int &x, int &y, float angle) {
+void rotateInt(int &x, int &y, float angle) {
   int tmpX = cosp(DEG2RAD(angle)) * x - sinp(DEG2RAD(angle)) * y;
   y = sinp(DEG2RAD(angle)) * x + cosp(DEG2RAD(angle)) * y;
   x = tmpX;
 }
-void rotate(float &x, float &y, float angle) {
-  int tmpX = cosp(DEG2RAD(angle)) * x - sinp(DEG2RAD(angle)) * y;
+void rotateFloat(float &x, float &y, float angle) {
+  float tmpX = cosp(DEG2RAD(angle)) * x - sinp(DEG2RAD(angle)) * y;
   y = sinp(DEG2RAD(angle)) * x + cosp(DEG2RAD(angle)) * y;
   x = tmpX;
 }
