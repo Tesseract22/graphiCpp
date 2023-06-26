@@ -294,6 +294,8 @@ template <int H, int W> struct Canvas {
   void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2,
                     Functor color) {
     if (y0 >= y1 && y1 >= y2) {
+      if (y0 == y2)
+        return drawLine(x0, y0, x2, y2, color);
       float grad = (float)(x0 - x2) / (float)(y0 - y2);
       int xm = grad * (y1 - y2) + x2;
       int w = xm - x1;

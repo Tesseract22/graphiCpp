@@ -8,8 +8,8 @@
 #include <stdint.h>
 
 int test[1] = {1000000000};
-const int H = 500;
-const int W = 500;
+const int H = 1000;
+const int W = 1000;
 Canvas<H, W> cv;
 int buf[W * H];
 const int cz = -5;
@@ -28,16 +28,16 @@ using namespace gcmath;
 extern "C" {
 void render(int dt) {
   Vec3D rotations = {0, dt * speed, 0};
-  static Camera camera{{0, -2, cz}, POV, {0, 0, 0}};
+  static Camera camera{{0, -5, cz}, POV, {30, 0, 0}};
   cv.fill(0xff000000);
   for (int i = 0; i < vlen; ++i) {
     Vec3D p = Vec3D::rotateAll({vs[i][0], vs[i][1], vs[i][2]}, rotations);
     Vec3D cm_p = camera.projectOnCanvas(p, cv);
     // putInt(1111111111);
     // cv.drawCircle(cm_p.x, cm_p.y, 5, CONST_PICKER(0xffff007f));
-    cv.drawPixel(cm_p.x, cm_p.y, 0xffff007f);
+    cv.drawPixel(cm_p.x, cm_p.y, 0xffff7f7f);
   }
-  for (int i = 0; i < 20; ++i) {
+  for (int i = 85; i < 100; ++i) {
     Vec3D cm_1 = camera.projectOnCanvas(
         Vec3D::rotateAll({vs[fs[i][0]][0], vs[fs[i][0]][1], vs[fs[i][0]][2]},
                          rotations),
@@ -72,8 +72,8 @@ void render(int dt) {
       };
     };
 
-    // cv.drawTriangle(cm_1.x, cm_1.y, cm_2.x, cm_2.y, cm_3.x, cm_3.y,
-    //                 make_picker(cv_1, cv_2, cv_3, 60));
+    cv.drawTriangle(cm_1.x, cm_1.y, cm_2.x, cm_2.y, cm_3.x, cm_3.y,
+                    CONST_PICKER(0xff003f7f));
     // cv.drawLine(cm_1.x, cm_1.y, cm_2.x, cm_2.y, CONST_PICKER(0X3f0000ff));
     // cv.drawLine(cm_3.x, cm_3.y, cm_2.x, cm_2.y, CONST_PICKER(0X3f00ff00));
     // cv.drawLine(cm_3.x, cm_3.y, cm_1.x, cm_1.y, CONST_PICKER(0X3fff0000));

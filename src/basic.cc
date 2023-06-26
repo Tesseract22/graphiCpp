@@ -25,6 +25,10 @@ void render(int dt) {
   cv.drawEllipse(W / 2, H / 2, H / 4, H / 3, CONST_PICKER(0x7fffff00), 3);
 
   cv.drawEllipse(W / 4, H / 4, H / 6, H / 9, CONST_PICKER(0x40ff0000), 30, 3);
+
+  cv.drawTriangle(100, 20, 300, 20, 200, 20, CONST_PICKER(0x7fff7f00));
+
+  cv.drawTriangleFlat(50, 200, 100, 20, 200, CONST_PICKER(0x7fff007f));
 }
 
 int main() { render(0); }

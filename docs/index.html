@@ -4,8 +4,8 @@
     <script>
         async function loadModule(url = "index.wasm") {
             const mem = new WebAssembly.Memory({
-                initial: 100,
-                maximum: 100,
+                initial: 400,
+                maximum: 400,
             })
 
             const heap_ptr = { value: 0 };
@@ -109,36 +109,36 @@
 
 
         };
-        
+
         loadModule("basic.wasm").then((res) => {
             const { module, mem, heap_ptr } = res;
             loadDemo(module, mem, "basic")
         })
-
-        loadModule("color.wasm").then((res) => {
-            const { module, mem } = res;
-            loadDemo(module, mem, "color")
-        })
-
-
-        loadModule("3d.wasm").then((res) => {
-            const { module, mem } = res;
-            loadDemo(module, mem, "3d");
-        })
-        loadModule("cube.wasm").then((res) => {
-            const { module, mem } = res;
-            loadDemo(module, mem, "cube");
-        })
-        loadModule("triangle.wasm").then((res) => {
-            const { module, mem } = res;
-            loadDemo(module, mem, "triangle");
-        })
-
-        loadModule("zbuf.wasm").then((res) => {
-            const { module, mem } = res;
-            loadDemo(module, mem, "zbuf");
-        })
-        
+        /*
+            loadModule("color.wasm").then((res) => {
+                const { module, mem } = res;
+                loadDemo(module, mem, "color")
+            })
+    
+    
+            loadModule("3d.wasm").then((res) => {
+                const { module, mem } = res;
+                loadDemo(module, mem, "3d");
+            })
+            loadModule("cube.wasm").then((res) => {
+                const { module, mem } = res;
+                loadDemo(module, mem, "cube");
+            })
+            loadModule("triangle.wasm").then((res) => {
+                const { module, mem } = res;
+                loadDemo(module, mem, "triangle");
+            })
+    
+            loadModule("zbuf.wasm").then((res) => {
+                const { module, mem } = res;
+                loadDemo(module, mem, "zbuf");
+            })
+            */
         loadModule("zsort.wasm").then((res) => {
             const { module, mem } = res;
             loadDemo(module, mem, "zsort");
