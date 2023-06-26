@@ -20,7 +20,7 @@ using namespace gcmath;
 
 extern "C" {
 void render(int dt) {
-
+  cv.blending = false;
   cv.fill(0xff000000);
   for (int i = 0; i < W * H; ++i) {
     buf[i] = 9999999;
@@ -83,19 +83,17 @@ void render(int dt) {
       test(x4, 0x7f007f7f) test(x11, 0x7fff0000) test(x22, 0x7f00ff00)
           test(x33, 0x7f0000ff) test(x44, 0x7f007f7f);
   const uint32_t alpha = 0xff000000;
-  auto make_picker = [&camera](Vec3D a, Vec3D b, Vec3D c, int hue) {
-    return [&camera, a, b, c, hue](int x, int y) -> uint32_t {
+  auto make_picker = [&camera](Vec3D a, Vec3D b, Vec3D c, int hue,
+                               float zshift = 1) {
+    return [&camera, a, b, c, hue, zshift](int x, int y) -> uint32_t {
       Vec3D cameraViewCoord = camera.canvas2CameraView(x, y, cv);
       Vec3D normal = Vec3D::crossProduct(a - b, a - c);
       float d = (a * normal) / (cameraViewCoord * normal);
       Vec3D p = (d * cameraViewCoord) + camera.pos;
-
+      p.z += zshift;
       if (buf[y * W + x] > p.z) {
         int vz = p.z / 6 + 50;
-        if (vz > 100)
-          vz = 100;
-        if (vz < 0)
-          vz = 0;
+        vz = gcmath::min(gcmath::max(vz, 100), 0);
         vz = 100 - vz;
         buf[y * W + x] = p.z;
         return alpha | HSV2RGB(hue, 100, vz);

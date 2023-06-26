@@ -28,9 +28,10 @@ using namespace gcmath;
 
 extern "C" {
 void render(int dt) {
+  cv.blending = false;
   Vec3D rotations = {0, dt * speed, 0};
   static Camera camera{{0, cy, cz}, POV, {0, 0, 0}};
-  auto make_picker = [=](Vec3D a, Vec3D b, Vec3D c, int hue) {
+  static auto make_picker = [=](Vec3D a, Vec3D b, Vec3D c, int hue) {
     return [=](int x, int y) -> uint32_t {
       Vec3D cameraViewCoord = camera.canvas2CameraView(x, y, cv);
       Vec3D normal = Vec3D::crossProduct(a - b, a - c);
@@ -59,7 +60,12 @@ void render(int dt) {
   for (int i = 0; i < flen; ++i) {
     // for fucking god sake
     // faces are 1-index, not 0-index
-    LOG(fs[i][0] << ' ' << fs[i][1] << ' ' << fs[i][2])
+    Vec3D cm_1 =
+        camera.projectOnCamera(Vec3D::rotateAll(vs[fs[i][0] - 1], rotations));
+    Vec3D cm_2 =
+        camera.projectOnCamera(Vec3D::rotateAll(vs[fs[i][1] - 1], rotations));
+    Vec3D cm_3 =
+        camera.projectOnCamera(Vec3D::rotateAll(vs[fs[i][2] - 1], rotations));
     Vec3D cv_1 = camera.projectOnCanvas(
         Vec3D::rotateAll(vs[fs[i][0] - 1], rotations), cv);
     Vec3D cv_2 = camera.projectOnCanvas(
@@ -67,12 +73,6 @@ void render(int dt) {
     Vec3D cv_3 = camera.projectOnCanvas(
         Vec3D::rotateAll(vs[fs[i][2] - 1], rotations), cv);
 
-    Vec3D cm_1 =
-        camera.projectOnCamera(Vec3D::rotateAll(vs[fs[i][0] - 1], rotations));
-    Vec3D cm_2 =
-        camera.projectOnCamera(Vec3D::rotateAll(vs[fs[i][1] - 1], rotations));
-    Vec3D cm_3 =
-        camera.projectOnCamera(Vec3D::rotateAll(vs[fs[i][2] - 1], rotations));
     // putInt(fs[i][0]);
     // putInt(fs[i][1]);
     // putInt(fs[i][2]);

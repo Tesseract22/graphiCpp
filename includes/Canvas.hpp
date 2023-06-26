@@ -243,7 +243,8 @@ template <int H, int W> struct Canvas {
     }
   }
   template <typename Functor>
-  void drawTriangleFlat(int x0, int y0, int w, int xt, int yt, Functor color) {
+  void drawTriangleFlat(int x0, int y0, int w, int xt, int yt, Functor color,
+                        bool antiAlias = false) {
     float grad1 = (float)(x0 - xt) / (float)(y0 - yt);
     float grad2 = (float)(x0 + w - xt) / (float)(y0 - yt);
 
@@ -259,7 +260,12 @@ template <int H, int W> struct Canvas {
         int x2 = intery2;
         if (x2 < x1)
           gcmath::swap(x1, x2);
-        for (int x = clampX(x1 + 1); x < clampX(x2 + 1); ++x) {
+        if (antiAlias) {
+          x1++;
+        }
+        x2++;
+
+        for (int x = clampX(x1); x < clampX(x2); ++x) {
           cv[y * W + x] = blend(color(x, y), cv[y * W + x]);
         }
         //   cv[y * W + clampX(x1)] = blend(color, cv[y * W + clampX(x1)]);
@@ -277,7 +283,11 @@ template <int H, int W> struct Canvas {
         int x2 = intery2;
         if (x2 < x1)
           gcmath::swap(x1, x2);
-        for (int x = clampX(x1 + 1); x < clampX(x2 + 1); ++x) {
+        if (antiAlias) {
+          x1++;
+        }
+        x2++;
+        for (int x = clampX(x1); x < clampX(x2); ++x) {
           cv[y * W + x] = blend(color(x, y), cv[y * W + x]);
         }
         //   cv[y * W + clampX(x1)] = blend(color, cv[y * W + clampX(x1)]);
@@ -286,9 +296,10 @@ template <int H, int W> struct Canvas {
         intery2 -= grad2;
       }
     }
-
-    drawLine(x0, y0, xt, yt, color);
-    drawLine(x0 + w, y0, xt, yt, color);
+    if (antiAlias) {
+      drawLine(x0, y0, xt, yt, color);
+      drawLine(x0 + w, y0, xt, yt, color);
+    }
   }
   template <typename Functor>
   void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2,
@@ -330,7 +341,7 @@ template <int H, int W> struct Canvas {
     float major, minor;
     float rot;
   };
-  //   bool blending = true;
+  bool blending = true;
 
 private:
   //   static int blend(uint32_t over, uint32_t back) {
@@ -353,6 +364,12 @@ private:
   //   }
 
   uint32_t blend(uint32_t over, uint32_t back) {
+    if (!blending) {
+      if (gcmath::ALPHA(over) == 0)
+        return back;
+      else
+        return over;
+    }
     uint8_t a =
         gcmath::min(gcmath::ALPHA(over) +
                         gcmath::ALPHA(back) * (255 - gcmath::ALPHA(over)) / 255,
