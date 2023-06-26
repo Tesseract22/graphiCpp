@@ -4,7 +4,8 @@ with open("tool/data", "r") as f:
 with open("tool/teapot.cc", "w") as f:
     firstf = True
     firsfv = True
-    f.write("float vs[][3] = {")
+    f.write("#include \"Space.hpp\"\n")
+    f.write("Vec3D vs[] = {")
     vlen = 0
     flen = 0
     for l in lines:
@@ -24,7 +25,8 @@ with open("tool/teapot.cc", "w") as f:
         elif arr[0] == 'v':
             # print("is vertex")
             vlen += 1
-            f.write("{%s, -%s, %s},\n"%(arr[1], arr[2], arr[3]))
+            
+            f.write("{%f, %f, %f},\n"%(100 *  float(arr[1]),-100 *  float(arr[2]),100 * float(arr[3])))
             pass
         else:
             print("unknown format")
