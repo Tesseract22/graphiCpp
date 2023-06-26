@@ -1,5 +1,5 @@
 CXX=clang++ -std=c++17
-CXX_FLAG=-I includes
+CXX_FLAG=-I includes -O3
 WASM= -Wl,--no-entry -Wl,--export-all -Wl,--allow-undefined -Wl,--import-memory --target=wasm32 -fno-builtin --no-standard-libraries
 file=make
 build: gen
