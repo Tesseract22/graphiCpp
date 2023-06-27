@@ -80,7 +80,7 @@
                 prev = t;
                 if (play) {
                     const before = Date.now();
-                    exports.render(dt * 5);
+                    exports.render(dt * 1);
                     // console.log(Date.now() - before);
                     ctx.putImageData(cv, 0, 0);
                     window.requestAnimationFrame(render);

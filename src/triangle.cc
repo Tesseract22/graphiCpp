@@ -40,20 +40,21 @@ void render(int dt) {
   Vec3D cCv = camera.projectOnCanvas(c, cv);
 
   auto plane = Vec3D::planeFromNormal(normal, a);
-  cv.drawTriangle(aCv.x, aCv.y, bCv.x, bCv.y, cCv.x, cCv.y,
-                  [&](int x, int y) -> uint32_t {
-                    Vec3D cameraViewCoord = camera.canvas2CameraView(x, y, cv);
-                    float d = (aCam * normal) / (cameraViewCoord * normal);
-                    Vec3D p = (d * cameraViewCoord) + camera.pos;
-                    int vz = p.z / 6 + 50;
-                    LOG(vz);
-                    if (vz > 100)
-                      vz = 100;
-                    if (vz < 0)
-                      vz = 0;
-                    vz = 100 - vz;
-                    return HSV2RGB(h, s, vz) | 0xff000000;
-                  });
+  cv.drawTriangle(
+      aCv.x, aCv.y, bCv.x, bCv.y, cCv.x, cCv.y,
+      [&](int x, int y) -> uint32_t {
+        Vec3D cameraViewCoord = camera.canvas2CameraView(x, y, cv);
+        float d = (aCam * normal) / (cameraViewCoord * normal);
+        Vec3D p = (d * cameraViewCoord) + camera.pos;
+        int vz = p.z / 6 + 50;
+        if (vz > 100)
+          vz = 100;
+        if (vz < 0)
+          vz = 0;
+        vz = 100 - vz;
+        return HSV2RGB(h, s, vz) | 0xff000000;
+      },
+      true);
 }
 
 int main() { render(4000); }

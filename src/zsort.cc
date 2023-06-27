@@ -35,6 +35,7 @@ void render(int dt) {
     return [=](int x, int y) -> uint32_t {
       Vec3D cameraViewCoord = camera.canvas2CameraView(x, y, cv);
       Vec3D normal = Vec3D::crossProduct(a - b, a - c);
+
       float d = (a * normal) / (cameraViewCoord * normal);
       Vec3D p = (d * cameraViewCoord);
       if (buf[y * W + x] > p.z) {
@@ -46,8 +47,7 @@ void render(int dt) {
         if (vz < 0)
           vz = 0;
         vz = 100 - vz;
-
-        return 0xff000000 | HSV2RGB(hue, vz, vz);
+        return 0xff000000 | HSV2RGB((int)(p.y + 360) % 360, 100, vz);
       }
       return 0;
     };
@@ -66,6 +66,9 @@ void render(int dt) {
         camera.projectOnCamera(Vec3D::rotateAll(vs[fs[i][1] - 1], rotations));
     Vec3D cm_3 =
         camera.projectOnCamera(Vec3D::rotateAll(vs[fs[i][2] - 1], rotations));
+    Vec3D normal = Vec3D::crossProduct(cm_1 - cm_2, cm_1 - cm_3);
+    if (normal.z + 100 <= 0)
+      continue;
     Vec3D cv_1 = camera.projectOnCanvas(
         Vec3D::rotateAll(vs[fs[i][0] - 1], rotations), cv);
     Vec3D cv_2 = camera.projectOnCanvas(
@@ -77,7 +80,7 @@ void render(int dt) {
     // putInt(fs[i][1]);
     // putInt(fs[i][2]);
     cv.drawTriangle(cv_1.x, cv_1.y, cv_2.x, cv_2.y, cv_3.x, cv_3.y,
-                    make_picker(cm_1, cm_2, cm_3, 120));
+                    make_picker(cm_1, cm_2, cm_3, 120), true);
     // cv.drawLine(cv_1.x, cv_1.y, cv_2.x, cv_2.y, CONST_PICKER(0X3f0000ff));
     // cv.drawLine(cv_3.x, cv_3.y, cv_2.x, cv_2.y, CONST_PICKER(0X3f00ff00));
     // cv.drawLine(cv_3.x, cv_3.y, cv_1.x, cv_1.y, CONST_PICKER(0X3fff0000));

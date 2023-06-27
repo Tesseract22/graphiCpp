@@ -28,7 +28,7 @@ void render(int dt) {
 
   cv.drawTriangle(100, 20, 300, 20, 200, 20, CONST_PICKER(0x7fff7f00));
 
-  cv.drawTriangleFlat(50, 200, 100, 20, 200, CONST_PICKER(0x7fff007f));
+  cv.drawTriangleFlat(50, 200, 100, 20, 200, CONST_PICKER(0xff000000));
 }
 
 int main() { render(0); }
