@@ -36,10 +36,10 @@ $(OBJ_COMMON)/%.o: $(SRC_COMMON)/%.cc
 	$(CXX) -c $(CXX_FLAG) $^  -o $@
 $(WASM_OUT)/%.wasm: $(DEMO)/%.cc $(COMMONS)
 	${CXX} ${CXX_FLAG} ${WASM_FLAG} $^ -o $@ 
-$(TEST)/%: $(OBJ)/%.o ${OBJS_COMMON}
-	$(CXX) $(CXX_FLAG) $^ $(TEST_ENTRY) -o $@
-$(TERM)/%: $(OBJ)/%.o ${OBJS_COMMON}
-	$(CXX) $(CXX_FLAG) $^ $(TERM_ENTRY) -o $@
+$(TEST)/%: $(OBJ)/%.o ${OBJS_COMMON} $(TEST_ENTRY)
+	$(CXX) $(CXX_FLAG) $^  -o $@
+$(TERM)/%: $(OBJ)/%.o ${OBJS_COMMON} $(TERM_ENTRY)
+	$(CXX) $(CXX_FLAG) $^ -o $@
 
 .PHONY:= clean obj wasm test
 .DEFAULT_GOAL:= wasm
