@@ -60,7 +60,7 @@
             const W = exports.WIDTH();
             console.log(H, W);
             exports.render(0);
-            const cv = new ImageData(new Uint8ClampedArray(memory, exports["cv"], H * W * 4), W);
+            const cv = new ImageData(new Uint8ClampedArray(memory, exports["CANVAS"](), H * W * 4), W);
 
 
             console.log(cv)

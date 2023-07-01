@@ -4,15 +4,6 @@
 #include <stdint.h>
 #define CONST_PICKER(color) [](int x, int y) -> uint32_t { return color; }
 
-#ifdef DEBUG
-#include <stdlib.h>
-extern "C" unsigned long long alloc(unsigned long long size) {
-  return (unsigned long long)malloc(size);
-}
-#else
-extern "C" unsigned long long alloc(unsigned long long size);
-#endif
-
 template <int H, int W> struct Canvas {
   struct Ret {
     float x;
@@ -190,8 +181,23 @@ template <int H, int W> struct Canvas {
 
   template <typename Functor>
   void drawLine(int x0, int y0, int x1, int y1, Functor color) {
-    float grad = (float)(y0 - y1) / (float)(x0 - x1);
+    // if (x0 == x1) {
+    //   for (int y = clampY(gcmath::min(y0, y1)); y < clampY(gcmath::max(y0,
+    //   y1));
+    //        ++y) {
+    //     cv[y * W + x0] = blend(color(x0, y), cv[y * W + x0]);
+    //   }
+    //   return;
+    // } else if (y0 == y1) {
+    //   for (int x = clampX(gcmath::min(x0, x1)); x < clampX(gcmath::max(x0,
+    //   x1));
+    //        ++x) {
+    //     cv[y0 * W + x] = blend(color(x, y0), cv[y0 * W + x0]);
+    //   }
+    //   return;
+    // }
 
+    float grad = (float)(y0 - y1) / (float)(x0 - x1);
     float intery;
     if (grad <= 1 && grad >= -1) {
 
@@ -245,9 +251,19 @@ template <int H, int W> struct Canvas {
   template <typename Functor>
   void drawTriangleFlat(int x0, int y0, int w, int xt, int yt, Functor color,
                         bool antiAlias = false) {
-    if (y0 == yt)
+    if (y0 == yt) {
+      for (int x = clampX(gcmath::min(xt, gcmath::min(x0, x0 + w)));
+           x < clampX(gcmath::max(xt, gcmath::max(x0, x0 + w))); ++x) {
+        int y = clampY(y0);
+        cv[y * W + x] = blend(color(x, y), cv[y * W + x]);
+      }
       return;
-#if 0
+    }
+    if (antiAlias) {
+      drawLine(x0, y0, xt, yt, color);
+      drawLine(x0 + w, y0, xt, yt, color);
+    }
+#if 1
     float grad1 = (float)(x0 - xt) / (float)(y0 - yt);
     float grad2 = (float)(x0 + w - xt) / (float)(y0 - yt);
 
@@ -301,39 +317,27 @@ template <int H, int W> struct Canvas {
       }
     }
 #endif
-    if (antiAlias) {
-      drawLine(x0, y0, xt, yt, color);
-      drawLine(x0 + w, y0, xt, yt, color);
-    }
   }
   template <typename Functor>
   void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2,
                     Functor color, bool antiAlias = false) {
 
     if (y0 >= y1 && y1 >= y2) {
-      //   if (y0 == y2) {
-      //     int xstart = gcmath::min(x0, gcmath::min(x1, x2));
-      //     int xend = gcmath::max(x0, gcmath::max(x1, x2));
-      //     for (int x = clampX(xstart); x < clampX(xend + 1); ++x) {
-      //       cv[y0 * W + x] = blend(color(x, y0), cv[y0 * W + x]);
-      //     }
-      //     return;
-      //   }
+      if (y0 == y2) {
+        int xstart = gcmath::min(x0, gcmath::min(x1, x2));
+        int xend = gcmath::max(x0, gcmath::max(x1, x2));
+        for (int x = clampX(xstart); x < clampX(xend + 1); ++x) {
+          cv[y0 * W + x] = blend(color(x, y0), cv[y0 * W + x]);
+        }
+        return;
+      }
       float grad = (float)(x0 - x2) / (float)(y0 - y2);
       int xm = grad * (y1 - y2) + x2;
       int w = xm - x1;
 
       //   LOG(x1 << ' ' << y1 << ' ' << x2 << ' ' << y2)
       drawTriangleFlat(x1, y1, w, x2, y2, color, antiAlias);
-      drawTriangleFlat(
-          x1, y1, w, x0, y0,
-          [y1, color](int x, int y) -> uint32_t {
-            if (y == y1)
-              return 0;
-            else
-              return color(x, y);
-          },
-          antiAlias);
+      drawTriangleFlat(x1, y1, w, x0, y0, color, antiAlias);
 
     } else {
       if (y0 <= y1 && y1 <= y2) {

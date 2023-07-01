@@ -8,7 +8,7 @@ template <typename T> struct Vec3 {
   T x;
   T y;
   T z;
-#ifdef DEBUG
+#ifndef WASM_DEMO
   friend std::ostream &operator<<(std::ostream &stream, const Vec3 &v) {
     stream << v.x << ' ' << v.y << ' ' << v.z;
     return stream;

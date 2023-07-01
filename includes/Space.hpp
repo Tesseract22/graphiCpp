@@ -3,7 +3,7 @@
 #include "Math.hpp"
 #include "Vec3D.h"
 
-#ifdef DEBUG
+#ifndef WASM_DEMO
 #include <iostream>
 #endif
 using gcmath::DEG2RAD;

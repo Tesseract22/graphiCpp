@@ -5,6 +5,8 @@
    "clang++",
    "-I",
    "includes",
+   "-I",
+   "model",
    "-DDEBUG",
    "src/basic.cc",
    "-o",
@@ -12,4 +14,5 @@
   ],
   "file": "src/basic.cc"
  }
-]
+]
+
