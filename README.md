@@ -2,6 +2,8 @@
 This is a immediate graphical library written in C++. Works completely on CPU and can be compiled to standalone wasm.
 See the wasm demos at https://tesseract22.github.io/graphiCpp/.
 
+All this library does is taking a buffer and draw shapes on that buffer, and a minimal toolchain for the buffer to display on browser (wasm) and terminal (ascii). 
+
 This is a powerful tool for integrating small, quick, costumizable visualization for existing C++ project.
 
 ## Installation & Build
@@ -36,6 +38,7 @@ To build all tests,
 - [ ] Fix perspective projection of sphere
 - [ ] Windows Comptiable (currently not)
 - [ ] ASCII demo with `SDL2` or `nCurse`.
-- [ ] W
+- [ ] Windows comptiable
+- [ ] WebGPU (?)
 
 
