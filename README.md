@@ -41,4 +41,10 @@ To build all tests,
 - [ ] Windows comptiable
 - [ ] WebGPU (?)
 
+I currently have plans to migrate to Zig, for
+
+- better memory management
+- better build system
+- better meta programming
+
 
